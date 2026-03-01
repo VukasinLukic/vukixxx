@@ -1,0 +1,184 @@
+.draggable-panel {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 12px;
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.05),
+        0 12px 24px rgba(0, 0, 0, 0.1),
+        0 4px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.1s;
+    pointer-events: auto;
+    user-select: none;
+}
+
+.draggable-panel:hover {
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.08),
+        0 16px 32px rgba(0, 0, 0, 0.12),
+        0 6px 12px rgba(0, 0, 0, 0.06);
+}
+
+.draggable-panel:active,
+.draggable-panel.resizing {
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.1),
+        0 20px 40px rgba(0, 0, 0, 0.15),
+        0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.draggable-panel.maximized {
+    border-radius: 0;
+    top: 20px !important;
+    left: 20px !important;
+    transform: none !important;
+}
+
+.panel-header {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    cursor: grab;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.panel-header:active {
+    cursor: grabbing;
+}
+
+.panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.window-controls {
+    display: flex;
+    gap: 8px;
+    width: 60px;
+}
+
+.header-spacer {
+    width: 60px;
+}
+
+.control-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    opacity: 1;
+    transition: opacity 0.15s, transform 0.1s;
+}
+
+.control-btn:hover {
+    transform: scale(1.1);
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+}
+
+.control-btn svg {
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.window-controls:hover .control-btn svg {
+    opacity: 0.7;
+}
+
+.control-btn.close {
+    background-color: #ff5f57;
+    border: 1px solid #e0443e;
+}
+
+.control-btn.close:hover {
+    background-color: #ff4136;
+}
+
+.control-btn.minimize {
+    background-color: #febc2e;
+    border: 1px solid #d89e24;
+}
+
+.control-btn.minimize:hover {
+    background-color: #f5a623;
+}
+
+.control-btn.maximize {
+    background-color: #28c840;
+    border: 1px solid #1aab29;
+}
+
+.control-btn.maximize:hover {
+    background-color: #2ecc40;
+}
+
+.panel-content {
+    flex: 1;
+    overflow: auto;
+    padding: 16px;
+    user-select: text;
+}
+
+/* Resize Handle */
+.resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    cursor: nwse-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0, 0, 0, 0.3);
+    transition: color 0.15s;
+    z-index: 10;
+}
+
+.resize-handle:hover {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.resize-handle svg {
+    transform: rotate(-45deg);
+}
+
+/* Custom scrollbar for panel content */
+.panel-content::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.panel-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.panel-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+}
+
+.panel-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+}

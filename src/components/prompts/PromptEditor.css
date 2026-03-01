@@ -1,0 +1,199 @@
+.prompt-editor {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+}
+
+.editor-header {
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    margin-bottom: 20px;
+}
+
+.editor-header h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin: 0 0 4px 0;
+}
+
+.editor-subtitle {
+    font-size: 13px;
+    color: #86868b;
+    margin: 0;
+}
+
+.editor-form {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1d1d1f;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.label-hint {
+    font-weight: 400;
+    color: #86868b;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    font-family: inherit;
+    font-size: 14px;
+    color: #1d1d1f;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 10px 12px;
+    outline: none;
+    transition: all 0.15s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    background: #fff;
+    border-color: rgba(0, 113, 227, 0.4);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+.form-group input.error,
+.form-group textarea.error {
+    border-color: #ff453a;
+    background: rgba(255, 69, 58, 0.05);
+}
+
+.form-group input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.error-text {
+    font-size: 12px;
+    color: #ff453a;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper select {
+    width: 100%;
+    appearance: none;
+    padding-right: 32px;
+    cursor: pointer;
+}
+
+.select-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #86868b;
+    pointer-events: none;
+}
+
+.content-group {
+    flex: 1;
+    min-height: 200px;
+}
+
+.content-group textarea {
+    flex: 1;
+    min-height: 180px;
+    resize: none;
+    font-family: ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Code", monospace;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.editor-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    margin-top: 16px;
+}
+
+.btn-primary,
+.btn-secondary {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-primary {
+    background: #1d1d1f;
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #333;
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: #1d1d1f;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.btn-secondary:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Scrollbar styling */
+.editor-form::-webkit-scrollbar {
+    width: 6px;
+}
+
+.editor-form::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.editor-form::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+}
+
+.editor-form::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+}

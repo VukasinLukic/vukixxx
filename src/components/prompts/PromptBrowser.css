@@ -1,0 +1,352 @@
+.prompt-browser {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background: white;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+}
+
+/* Sidebar */
+.browser-sidebar {
+    width: 200px;
+    background: rgba(247, 247, 247, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 12px 0;
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-group {
+    padding: 0 10px;
+    flex: 1;
+}
+
+.sidebar-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: #86868b;
+    margin-left: 10px;
+    margin-bottom: 6px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.sidebar-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #1d1d1f;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.1s;
+}
+
+.sidebar-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.sidebar-item.active {
+    background: rgba(0, 0, 0, 0.08);
+    color: #1d1d1f;
+}
+
+.sidebar-icon {
+    opacity: 0.6;
+    color: #1d1d1f;
+}
+
+.sidebar-item.active .sidebar-icon {
+    opacity: 0.8;
+}
+
+.sidebar-label {
+    flex: 1;
+}
+
+.sidebar-count {
+    font-size: 11px;
+    color: #86868b;
+    font-weight: 500;
+}
+
+/* Sidebar Footer - Add Button */
+.sidebar-footer {
+    padding: 12px 10px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    margin-top: auto;
+}
+
+.add-prompt-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 12px;
+    border: none;
+    background: #1d1d1f;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+}
+
+.add-prompt-btn:hover {
+    background: #333;
+}
+
+/* Content Area */
+.browser-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+
+/* Toolbar */
+.browser-toolbar {
+    height: 48px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+}
+
+.toolbar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-bar {
+    position: relative;
+    width: 220px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #86868b;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 8px 10px 8px 32px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(0, 0, 0, 0.03);
+    font-size: 13px;
+    font-family: inherit;
+    color: #1d1d1f;
+    outline: none;
+    transition: all 0.15s;
+}
+
+.search-bar input::placeholder {
+    color: #86868b;
+}
+
+.search-bar input:focus {
+    background: #fff;
+    border-color: rgba(0, 113, 227, 0.4);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+.view-toggles {
+    display: flex;
+    background: rgba(0, 0, 0, 0.04);
+    padding: 2px;
+    border-radius: 6px;
+}
+
+.toggle-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #86868b;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-btn:hover {
+    color: #1d1d1f;
+}
+
+.toggle-btn.active {
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    color: #1d1d1f;
+}
+
+/* File View */
+.file-view {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #86868b;
+    gap: 8px;
+}
+
+.empty-state svg {
+    opacity: 0.4;
+}
+
+.empty-state span {
+    font-size: 14px;
+}
+
+.empty-action {
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: #1d1d1f;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.empty-action:hover {
+    background: #333;
+}
+
+/* List Mode */
+.file-view.list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.file-view.list .file-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.file-view.list .file-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.file-view.list .file-item:active {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.file-view.list .file-icon {
+    margin-right: 12px;
+    color: #0071e3;
+}
+
+.file-view.list .file-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.file-view.list .file-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1d1d1f;
+}
+
+.file-view.list .file-meta {
+    font-size: 11px;
+    color: #86868b;
+    text-transform: capitalize;
+}
+
+/* Grid Mode */
+.file-view.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+}
+
+.file-view.grid .file-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.1s;
+}
+
+.file-view.grid .file-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.file-view.grid .file-item:active {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.file-view.grid .file-icon {
+    margin-bottom: 8px;
+    color: #0071e3;
+}
+
+.file-view.grid .file-info .file-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #1d1d1f;
+    word-break: break-word;
+    line-height: 1.3;
+}
+
+.file-view.grid .file-info .file-meta {
+    display: none;
+}
+
+/* Scrollbar */
+.file-view::-webkit-scrollbar {
+    width: 6px;
+}
+
+.file-view::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.file-view::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+}
+
+.file-view::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+}
