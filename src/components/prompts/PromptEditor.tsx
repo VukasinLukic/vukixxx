@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { ChevronDown } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { ChevronDown, Sparkles } from 'lucide-react';
 import { parsePromptFile } from '@/lib/promptParser';
 import { ALL_CATEGORIES, CATEGORY_CONFIG } from '@/types/categories';
+import { useAIStore } from '@/stores/aiStore';
+import { classifyPrompt } from '@/services/ai/classifier';
 import type { Prompt, PromptCategory } from '@/types';
 import './PromptEditor.css';
 
@@ -44,6 +46,25 @@ export const PromptEditor: React.FC<PromptEditorProps> = ({
   });
   const [errors, setErrors] = useState<Record<string, string | null>>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [isClassifying, setIsClassifying] = useState(false);
+  const getActiveProvider = useAIStore(s => s.getActiveProvider);
+
+  const handleAutoClassify = useCallback(async () => {
+    if (!formData.label && !formData.content) return;
+    setIsClassifying(true);
+    try {
+      const provider = await getActiveProvider();
+      const result = await classifyPrompt(provider, formData.label, formData.content);
+      setFormData(prev => ({
+        ...prev,
+        category: result.category,
+      }));
+    } catch (err) {
+      console.warn('Auto-classify failed:', err);
+    } finally {
+      setIsClassifying(false);
+    }
+  }, [formData.label, formData.content, getActiveProvider]);
 
   useEffect(() => {
     if (initialData) {
@@ -186,7 +207,19 @@ ${formData.content}`;
 
         <div className="form-row">
           <div className="form-group">
-            <label>Category</label>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <label>Category</label>
+              <button
+                type="button"
+                className="auto-classify-btn"
+                onClick={handleAutoClassify}
+                disabled={isClassifying || (!formData.label && !formData.content)}
+                title="Auto-classify with AI"
+              >
+                {isClassifying ? <span className="spinner" /> : <Sparkles size={12} />}
+                {isClassifying ? 'Classifying...' : 'Auto'}
+              </button>
+            </div>
             <div className="select-wrapper">
               <select
                 value={formData.category}

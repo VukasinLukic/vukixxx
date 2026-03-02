@@ -1,5 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Dock } from './components/layout/Dock';
+import { TitleBar } from './components/layout/TitleBar';
 import { DraggablePanel } from './components/ui/DraggablePanel';
 import { MemoryGraph } from './components/memory/MemoryGraph';
 import { PromptBrowser } from './components/prompts/PromptBrowser';
@@ -9,9 +11,12 @@ import { ConfirmDialog } from './components/ui/ConfirmDialog';
 import { ToastContainer } from './components/ui/Toast';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { GraphErrorBoundary } from './components/ui/GraphErrorBoundary';
+import { MemoryPacksView } from './components/packs/MemoryPacksView';
+import { SettingsView } from './components/settings/SettingsView';
 import { usePromptStore } from './stores/promptStore';
 import { usePanelStore } from './stores/panelStore';
 import { useUIStore } from './stores/uiStore';
+import { initTauri } from './lib/tauriSetup';
 import type { Prompt, GraphNode } from './types';
 
 function App() {
@@ -50,10 +55,11 @@ function App() {
     hideConfirm,
   } = useUIStore();
 
-  // Load prompts on mount
+  // Load prompts on mount + initialize Tauri
   useEffect(() => {
     loadPrompts();
-  }, [loadPrompts]);
+    initTauri(setActiveTab);
+  }, [loadPrompts, setActiveTab]);
 
   // Show browser when prompts tab is active
   useEffect(() => {
@@ -165,17 +171,69 @@ function App() {
   return (
     <ErrorBoundary>
       <div className="app-container">
+        {/* Custom Title Bar (Tauri only - returns null in browser) */}
+        <TitleBar />
+
         {/* Memory Graph Background */}
-        {activeTab === 'memory' && (
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
-            <GraphErrorBoundary>
-              <MemoryGraph
-                onNodeSelect={handleNodeSelect}
-                onAddPrompt={handleAddPrompt}
-              />
-            </GraphErrorBoundary>
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {activeTab === 'memory' && (
+            <motion.div
+              key="memory"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}
+            >
+              <GraphErrorBoundary>
+                <MemoryGraph
+                  onNodeSelect={handleNodeSelect}
+                  onAddPrompt={handleAddPrompt}
+                />
+              </GraphErrorBoundary>
+            </motion.div>
+          )}
+
+          {/* Memory Packs */}
+          {activeTab === 'packs' && (
+            <motion.div
+              key="packs"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.25 }}
+              style={{
+                position: 'absolute', top: 0, left: 0, width: '100%',
+                height: 'calc(100% - 80px)', zIndex: 2,
+                background: 'rgba(245,245,247,0.95)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+              }}
+            >
+              <MemoryPacksView />
+            </motion.div>
+          )}
+
+          {/* Settings */}
+          {activeTab === 'settings' && (
+            <motion.div
+              key="settings"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.25 }}
+              style={{
+                position: 'absolute', top: 0, left: 0, width: '100%',
+                height: 'calc(100% - 80px)', zIndex: 2,
+                background: 'rgba(245,245,247,0.95)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+              }}
+            >
+              <SettingsView />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Panels Layer */}
         <div
@@ -187,76 +245,82 @@ function App() {
           }}
         >
           {/* Static Panels */}
-          {Object.values(panels).map(panel => (
-            panel.visible && (
-              <DraggablePanel
-                key={panel.id}
-                title={panel.title}
-                initialPosition={panel.initialPosition}
-                width={panel.width}
-                height={panel.height}
-                zIndex={panel.zIndex}
-                onClose={() => hidePanel(panel.id)}
-                onFocus={() => bringToFront(panel.id, false)}
-                className="pointer-events-auto"
-              >
-                {panel.id === 'browser' ? (
-                  <PromptBrowser
-                    prompts={promptsArray}
-                    onSelectPrompt={handleOpenPrompt}
-                    onAddPrompt={handleAddPrompt}
-                  />
-                ) : panel.id === 'welcome' ? (
-                  WelcomeContent
-                ) : null}
-              </DraggablePanel>
-            )
-          ))}
+          <AnimatePresence>
+            {Object.values(panels).map(panel => (
+              panel.visible && (
+                <DraggablePanel
+                  key={panel.id}
+                  title={panel.title}
+                  initialPosition={panel.initialPosition}
+                  width={panel.width}
+                  height={panel.height}
+                  zIndex={panel.zIndex}
+                  onClose={() => hidePanel(panel.id)}
+                  onFocus={() => bringToFront(panel.id, false)}
+                  className="pointer-events-auto"
+                >
+                  {panel.id === 'browser' ? (
+                    <PromptBrowser
+                      prompts={promptsArray}
+                      onSelectPrompt={handleOpenPrompt}
+                      onAddPrompt={handleAddPrompt}
+                    />
+                  ) : panel.id === 'welcome' ? (
+                    WelcomeContent
+                  ) : null}
+                </DraggablePanel>
+              )
+            ))}
+          </AnimatePresence>
 
           {/* Dynamic Prompt Windows */}
-          {promptWindows.map(window => (
-            <DraggablePanel
-              key={window.id}
-              title={window.title}
-              initialPosition={window.initialPosition}
-              width={window.width}
-              height={window.height}
-              zIndex={window.zIndex}
-              onClose={() => closePromptWindow(window.id)}
-              onFocus={() => bringToFront(window.id, true)}
-              className="pointer-events-auto"
-            >
-              <PromptViewer
-                prompt={window.prompt}
-                onEdit={() => handleEditPrompt(window.prompt)}
-                onDelete={() => handleDeletePrompt(window.prompt.id)}
-                onCopySuccess={handleCopySuccess}
-              />
-            </DraggablePanel>
-          ))}
+          <AnimatePresence>
+            {promptWindows.map(window => (
+              <DraggablePanel
+                key={window.id}
+                title={window.title}
+                initialPosition={window.initialPosition}
+                width={window.width}
+                height={window.height}
+                zIndex={window.zIndex}
+                onClose={() => closePromptWindow(window.id)}
+                onFocus={() => bringToFront(window.id, true)}
+                className="pointer-events-auto"
+              >
+                <PromptViewer
+                  prompt={window.prompt}
+                  onEdit={() => handleEditPrompt(window.prompt)}
+                  onDelete={() => handleDeletePrompt(window.prompt.id)}
+                  onCopySuccess={handleCopySuccess}
+                />
+              </DraggablePanel>
+            ))}
+          </AnimatePresence>
 
           {/* Editor Panel */}
-          {editorPanel && (
-            <DraggablePanel
-              key="editor"
-              title={editorPanel.title}
-              initialPosition={editorPanel.initialPosition}
-              width={editorPanel.width}
-              height={editorPanel.height}
-              zIndex={editorPanel.zIndex}
-              onClose={closeEditor}
-              onFocus={() => bringToFront('editor', false)}
-              className="pointer-events-auto"
-            >
-              <PromptEditor
-                mode={editorPanel.mode}
-                initialData={editorPanel.data}
-                existingPrompts={promptsArray}
-                onSave={handleSavePrompt}
-                onCancel={closeEditor}
-              />
-            </DraggablePanel>
-          )}
+          <AnimatePresence>
+            {editorPanel && (
+              <DraggablePanel
+                key="editor"
+                title={editorPanel.title}
+                initialPosition={editorPanel.initialPosition}
+                width={editorPanel.width}
+                height={editorPanel.height}
+                zIndex={editorPanel.zIndex}
+                onClose={closeEditor}
+                onFocus={() => bringToFront('editor', false)}
+                className="pointer-events-auto"
+              >
+                <PromptEditor
+                  mode={editorPanel.mode}
+                  initialData={editorPanel.data}
+                  existingPrompts={promptsArray}
+                  onSave={handleSavePrompt}
+                  onCancel={closeEditor}
+                />
+              </DraggablePanel>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Dock Navigation */}

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Copy, FileText, Edit3, Trash2 } from 'lucide-react';
+import { Copy, FileText, Edit3, Trash2, Sparkles } from 'lucide-react';
 import { promptToTOON, getTOONStats } from '@/lib/toonConverter';
+import { usePromptStore } from '@/stores/promptStore';
+import { getHeuristicSuggestions } from '@/services/ai/suggestions';
 import type { Prompt } from '@/types';
 import './PromptViewer.css';
 
@@ -14,6 +16,15 @@ interface PromptViewerProps {
 
 export const PromptViewer: React.FC<PromptViewerProps> = ({ prompt, onEdit, onDelete, onCopySuccess }) => {
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+  // Use prompts Map directly to avoid creating new array on every render
+  const prompts = usePromptStore(s => s.prompts);
+
+  const allPrompts = useMemo(() => Array.from(prompts.values()), [prompts]);
+
+  const suggestions = useMemo(
+    () => getHeuristicSuggestions(prompt, allPrompts),
+    [prompt, allPrompts]
+  );
 
   const handleCopyMarkdown = async () => {
     try {
@@ -54,6 +65,22 @@ export const PromptViewer: React.FC<PromptViewerProps> = ({ prompt, onEdit, onDe
       <div className="markdown-body">
         <ReactMarkdown>{displayContent}</ReactMarkdown>
       </div>
+
+      {/* Related Prompts */}
+      {suggestions.length > 0 && (
+        <div className="suggestions-panel">
+          <div className="suggestions-title">
+            <Sparkles size={10} style={{ display: 'inline', marginRight: 4 }} />
+            Related Prompts
+          </div>
+          {suggestions.map(s => (
+            <div key={s.promptId} className="suggestion-item">
+              <span className="suggestion-label">{s.label}</span>
+              <span className="suggestion-score">{Math.round(s.score * 100)}%</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="viewer-footer">
         <div className="copy-buttons">

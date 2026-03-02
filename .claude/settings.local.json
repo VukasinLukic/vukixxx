@@ -5,7 +5,22 @@
       "Bash(netstat:*)",
       "Bash(ls:*)",
       "Bash(dir:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(timeout 10 npm run dev)",
+      "Bash(timeout 8 npm run dev:*)",
+      "Bash(rustc:*)",
+      "Bash(cargo --version:*)",
+      "Bash(where:*)",
+      "Bash(cmd /c \"rustc --version\")",
+      "Bash(c:/Vukixxx/generate-icons.js << 'EOF'\nconst fs = require\\('fs'\\);\nconst path = require\\('path'\\);\n\n// Minimal valid 1x1 transparent PNG \\(8 bytes of image data\\)\n// This is the smallest valid PNG file possible\nconst minimalPNG = Buffer.from\\([\n  // PNG signature\n  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,\n  \n  // IHDR chunk \\(width=1, height=1, 8-bit RGBA\\)\n  0x00, 0x00, 0x00, 0x0D, // chunk length\n  0x49, 0x48, 0x44, 0x52, // \"IHDR\"\n  0x00, 0x00, 0x00, 0x01, // width = 1\n  0x00, 0x00, 0x00, 0x01, // height = 1\n  0x08, // bit depth\n  0x06, // color type \\(RGBA\\)\n  0x00, // compression\n  0x00, // filter\n  0x00, // interlace\n  0x1F, 0x15, 0xC4, 0x89, // CRC\n  \n  // IDAT chunk \\(minimal data\\)\n  0x00, 0x00, 0x00, 0x0C, // chunk length\n  0x49, 0x44, 0x41, 0x54, // \"IDAT\"\n  0x08, 0xD7, 0x63, 0xF8, 0x0F, 0x00, 0x00, 0x01,\n  0x01, 0x01, 0x00, 0x1B, 0xB6, 0xEE, 0x56,\n  \n  // IEND chunk\n  0x00, 0x00, 0x00, 0x00, // chunk length\n  0x49, 0x45, 0x4E, 0x44, // \"IEND\"\n  0xAE, 0x42, 0x60, 0x82  // CRC\n]\\);\n\nconst iconsDir = 'c:/Vukixxx/src-tauri/icons';\n\nconst iconFiles = [\n  'icon.png',\n  '32x32.png',\n  '128x128.png',\n  '128x128@2x.png',\n  'icon.ico'  // Use PNG for .ico as well \\(modern Windows supports this\\)\n];\n\ntry {\n  iconFiles.forEach\\(filename => {\n    const filePath = path.join\\(iconsDir, filename\\);\n    fs.writeFileSync\\(filePath, minimalPNG\\);\n    console.log\\(`Created: ${filePath}`\\);\n  }\\);\n  console.log\\('\\\\nAll icon files created successfully!'\\);\n} catch \\(error\\) {\n  console.error\\('Error creating icon files:', error.message\\);\n  process.exit\\(1\\);\n}\nEOF)",
+      "Bash(node:*)",
+      "Bash(c:/Vukixxx/generate-icons.cjs << 'EOF'\nconst fs = require\\('fs'\\);\nconst path = require\\('path'\\);\n\n// Minimal valid 1x1 transparent PNG \\(8 bytes of image data\\)\n// This is the smallest valid PNG file possible\nconst minimalPNG = Buffer.from\\([\n  // PNG signature\n  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,\n  \n  // IHDR chunk \\(width=1, height=1, 8-bit RGBA\\)\n  0x00, 0x00, 0x00, 0x0D, // chunk length\n  0x49, 0x48, 0x44, 0x52, // \"IHDR\"\n  0x00, 0x00, 0x00, 0x01, // width = 1\n  0x00, 0x00, 0x00, 0x01, // height = 1\n  0x08, // bit depth\n  0x06, // color type \\(RGBA\\)\n  0x00, // compression\n  0x00, // filter\n  0x00, // interlace\n  0x1F, 0x15, 0xC4, 0x89, // CRC\n  \n  // IDAT chunk \\(minimal data\\)\n  0x00, 0x00, 0x00, 0x0C, // chunk length\n  0x49, 0x44, 0x41, 0x54, // \"IDAT\"\n  0x08, 0xD7, 0x63, 0xF8, 0x0F, 0x00, 0x00, 0x01,\n  0x01, 0x01, 0x00, 0x1B, 0xB6, 0xEE, 0x56,\n  \n  // IEND chunk\n  0x00, 0x00, 0x00, 0x00, // chunk length\n  0x49, 0x45, 0x4E, 0x44, // \"IEND\"\n  0xAE, 0x42, 0x60, 0x82  // CRC\n]\\);\n\nconst iconsDir = 'c:/Vukixxx/src-tauri/icons';\n\nconst iconFiles = [\n  'icon.png',\n  '32x32.png',\n  '128x128.png',\n  '128x128@2x.png',\n  'icon.ico'  // Use PNG for .ico as well \\(modern Windows supports this\\)\n];\n\ntry {\n  iconFiles.forEach\\(filename => {\n    const filePath = path.join\\(iconsDir, filename\\);\n    fs.writeFileSync\\(filePath, minimalPNG\\);\n    console.log\\(`Created: ${filePath}`\\);\n  }\\);\n  console.log\\('\\\\nAll icon files created successfully!'\\);\n} catch \\(error\\) {\n  console.error\\('Error creating icon files:', error.message\\);\n  process.exit\\(1\\);\n}\nEOF)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout:*)",
+      "Bash(npm run tauri:dev:*)",
+      "Bash(ping:*)",
+      "Bash(curl:*)",
+      "Bash(where.exe:*)"
     ]
   }
 }

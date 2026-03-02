@@ -167,10 +167,51 @@ export interface ConfirmDialogConfig {
   onConfirm: () => void;
 }
 
+// --- Filters ---
+
+export type DateRange = 'week' | 'month' | 'quarter' | 'all';
+
+export interface PromptFilters {
+  search: string;
+  categories: PromptCategory[];
+  tags: string[];
+  dateRange: DateRange;
+  sortBy: 'label' | 'updatedAt' | 'createdAt' | 'category';
+  sortOrder: 'asc' | 'desc';
+}
+
+// --- AI / LLM ---
+
+export type LLMProviderId = 'ollama' | 'gemini' | 'claude';
+
+export interface LLMProviderConfig {
+  id: LLMProviderId;
+  name: string;
+  enabled: boolean;
+  baseUrl?: string;
+  apiKey?: string;
+  model: string;
+}
+
+export interface ClassificationResult {
+  category: PromptCategory;
+  tags: string[];
+  confidence: number;
+}
+
+export interface SuggestionResult {
+  promptId: string;
+  label: string;
+  score: number;
+  reason: string;
+}
+
 // --- App Settings ---
 
 export interface AppSettings {
   promptsDir: string;
   theme: 'light' | 'dark';
   language: 'en' | 'sr';
+  aiProvider: LLMProviderId;
+  aiProviders: Record<LLMProviderId, LLMProviderConfig>;
 }

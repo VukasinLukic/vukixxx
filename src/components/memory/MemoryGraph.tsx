@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import ForceGraph3D from 'react-force-graph-3d';
 import * as THREE from 'three';
 import { usePromptStore } from '@/stores/promptStore';
+import { usePackStore } from '@/stores/packStore';
 import { GRAPH_COLORS, NODE_SIZES } from '@/types/categories';
 import type { Prompt, GraphNode, GraphLink, GraphData } from '@/types';
 
@@ -50,20 +51,42 @@ interface MemoryGraphProps {
 }
 
 export const MemoryGraph: React.FC<MemoryGraphProps> = ({ onNodeSelect, onAddPrompt }) => {
-  // Consume from store instead of duplicate import.meta.glob
-  const prompts = usePromptStore(state => state.prompts);
+  // Stable prompts selection - subscribe only to prompts count, not the Map itself
+  const [graphData, setGraphData] = useState<GraphData>({ nodes: [], links: [] });
+  const [packs, setPacks] = useState<any[]>([]);
+  const addPromptToPack = usePackStore(state => state.addPromptToPack);
 
-  const graphData = useMemo(() => {
-    return buildGraphData(Array.from(prompts.values()));
-  }, [prompts]);
+  // Subscribe to packs changes
+  useEffect(() => {
+    const unsubscribe = usePackStore.subscribe((state) => {
+      setPacks(Array.from(state.packs.values()));
+    });
+    setPacks(Array.from(usePackStore.getState().packs.values()));
+    return unsubscribe;
+  }, []);
+
+  // Update graph data when prompts change
+  useEffect(() => {
+    const unsubscribe = usePromptStore.subscribe((state) => {
+      const promptsArray = Array.from(state.prompts.values());
+      setGraphData(buildGraphData(promptsArray));
+    });
+
+    // Initial load
+    const initialPrompts = Array.from(usePromptStore.getState().prompts.values());
+    setGraphData(buildGraphData(initialPrompts));
+
+    return unsubscribe;
+  }, []);
 
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null);
   const fgRef = useRef<any>();
 
-  // Texture cache to prevent memory leaks
+  // GPU resource caches to prevent memory leaks
   const textureCache = useRef(new Map<string, THREE.CanvasTexture>());
   const materialCache = useRef(new Map<string, THREE.MeshBasicMaterial>());
+  const geometryCache = useRef(new Map<string, THREE.BufferGeometry>());
 
   // Cleanup on unmount - dispose all cached GPU resources
   useEffect(() => {
@@ -72,6 +95,8 @@ export const MemoryGraph: React.FC<MemoryGraphProps> = ({ onNodeSelect, onAddPro
       textureCache.current.clear();
       materialCache.current.forEach(mat => mat.dispose());
       materialCache.current.clear();
+      geometryCache.current.forEach(geo => geo.dispose());
+      geometryCache.current.clear();
     };
   }, []);
 
@@ -95,13 +120,31 @@ export const MemoryGraph: React.FC<MemoryGraphProps> = ({ onNodeSelect, onAddPro
     document.body.style.cursor = node ? 'pointer' : 'default';
   }, []);
 
-  // Optimized node rendering with texture caching
+  const getCircleGeometry = useCallback((size: number, segments: number) => {
+    const key = `circle-${size}-${segments}`;
+    let geo = geometryCache.current.get(key);
+    if (!geo) {
+      geo = new THREE.CircleGeometry(size, segments);
+      geometryCache.current.set(key, geo);
+    }
+    return geo;
+  }, []);
+
+  // Node count determines LOD strategy
+  const nodeCount = graphData.nodes.length;
+  const useLowDetail = nodeCount > 100;
+  const useMinimalDetail = nodeCount > 500;
+
+  // Optimized node rendering with LOD + texture caching
   const nodeThreeObject = useCallback((node: GraphNode) => {
     const group = new THREE.Group();
     const isHighlighted = hoveredNode?.id === node.id || selectedNode?.id === node.id;
 
-    // Circle geometry (shared via Three.js internal cache)
-    const geometry = new THREE.CircleGeometry(node.val, 32);
+    // LOD: Reduce polygon count for large graphs
+    const segments = useMinimalDetail ? 8 : useLowDetail ? 16 : 32;
+
+    // Reuse geometry via cache
+    const geometry = getCircleGeometry(node.val, segments);
     const material = new THREE.MeshBasicMaterial({
       color: node.color,
       transparent: true,
@@ -111,62 +154,88 @@ export const MemoryGraph: React.FC<MemoryGraphProps> = ({ onNodeSelect, onAddPro
     const circle = new THREE.Mesh(geometry, material);
     group.add(circle);
 
-    // Highlight ring
+    // Highlight ring (only for highlighted nodes)
     if (isHighlighted) {
-      const ringGeometry = new THREE.RingGeometry(node.val + 1, node.val + 2, 32);
+      const ringKey = `ring-${node.val}`;
+      let ringGeo = geometryCache.current.get(ringKey);
+      if (!ringGeo) {
+        ringGeo = new THREE.RingGeometry(node.val + 1, node.val + 2, segments);
+        geometryCache.current.set(ringKey, ringGeo);
+      }
       const ringMaterial = new THREE.MeshBasicMaterial({
         color: '#1d1d1f',
         transparent: true,
         opacity: 0.3,
         side: THREE.DoubleSide,
       });
-      const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+      const ring = new THREE.Mesh(ringGeo, ringMaterial);
       group.add(ring);
     }
 
-    // Text label with texture caching
-    const cacheKey = `${node.id}-${isHighlighted}`;
-    let texture = textureCache.current.get(cacheKey);
+    // LOD: Skip text labels for minimal detail mode (500+ nodes)
+    // Only show labels for highlighted nodes or in regular/low detail mode
+    if (!useMinimalDetail || isHighlighted) {
+      const cacheKey = `${node.id}-${isHighlighted}`;
+      let texture = textureCache.current.get(cacheKey);
 
-    if (!texture) {
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d')!;
-      canvas.width = 512;
-      canvas.height = 128;
+      if (!texture) {
+        // LOD: Smaller canvas for non-highlighted in large graphs
+        const canvasSize = (useLowDetail && !isHighlighted) ? 256 : 512;
+        const fontSize = (useLowDetail && !isHighlighted) ? 18 : 36;
 
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.fillStyle = '#1d1d1f';
-      context.font = `${isHighlighted ? '600' : '500'} 36px -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif`;
-      context.textAlign = 'center';
-      context.textBaseline = 'middle';
-      context.fillText(node.name, 256, 64);
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d')!;
+        canvas.width = canvasSize;
+        canvas.height = canvasSize / 4;
 
-      texture = new THREE.CanvasTexture(canvas);
-      texture.needsUpdate = true;
-      textureCache.current.set(cacheKey, texture);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = '#1d1d1f';
+        context.font = `${isHighlighted ? '600' : '500'} ${fontSize}px -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif`;
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText(node.name, canvas.width / 2, canvas.height / 2);
+
+        texture = new THREE.CanvasTexture(canvas);
+        texture.needsUpdate = true;
+        textureCache.current.set(cacheKey, texture);
+      }
+
+      const spriteMaterial = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true,
+        opacity: isHighlighted ? 1 : 0.8,
+      });
+      const sprite = new THREE.Sprite(spriteMaterial);
+      const spriteScale = (useLowDetail && !isHighlighted) ? 20 : 40;
+      sprite.scale.set(spriteScale, spriteScale / 4, 1);
+      sprite.position.y = node.val + 10;
+      group.add(sprite);
     }
 
-    const spriteMaterial = new THREE.SpriteMaterial({
-      map: texture,
-      transparent: true,
-      opacity: isHighlighted ? 1 : 0.8,
-    });
-    const sprite = new THREE.Sprite(spriteMaterial);
-    sprite.scale.set(40, 10, 1);
-    sprite.position.y = node.val + 10;
-    group.add(sprite);
-
     return group;
-  }, [hoveredNode, selectedNode]);
+  }, [hoveredNode, selectedNode, useLowDetail, useMinimalDetail, getCircleGeometry]);
 
   const linkColor = useCallback(() => 'rgba(29, 29, 31, 0.15)', []);
 
   const resetCamera = useCallback(() => {
     if (fgRef.current) {
-      fgRef.current.cameraPosition({ x: 0, y: 50, z: 250 }, { x: 0, y: 0, z: 0 }, 800);
+      fgRef.current.cameraPosition({ x: 0, y: 100, z: 300 }, { x: 0, y: 0, z: 0 }, 800);
     }
     setSelectedNode(null);
   }, []);
+
+  // Set initial camera position when graph loads
+  useEffect(() => {
+    if (fgRef.current && graphData.nodes.length > 0) {
+      // Wait for the graph to render, then set initial camera
+      const timer = setTimeout(() => {
+        if (fgRef.current) {
+          fgRef.current.cameraPosition({ x: 0, y: 100, z: 300 }, { x: 0, y: 0, z: 0 }, 1000);
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [graphData.nodes.length]);
 
   // Build legend from actual categories in graph
   const legendCategories = useMemo(() => {
@@ -279,10 +348,34 @@ export const MemoryGraph: React.FC<MemoryGraphProps> = ({ onNodeSelect, onAddPro
             <div><span style={{ color: '#1d1d1f' }}>Type:</span> {selectedNode.type}</div>
             <div><span style={{ color: '#1d1d1f' }}>Category:</span> {selectedNode.category}</div>
           </div>
+          {packs.length > 0 && selectedNode.type !== 'phantom' && (
+            <div style={{ marginTop: 16 }}>
+              <select
+                defaultValue=""
+                onChange={e => {
+                  if (e.target.value) {
+                    addPromptToPack(e.target.value, selectedNode.id);
+                    e.target.value = '';
+                  }
+                }}
+                style={{
+                  width: '100%', padding: '8px 10px',
+                  border: '1px solid rgba(0,0,0,0.1)', borderRadius: 8,
+                  fontSize: 12, fontFamily: 'inherit', color: '#1d1d1f',
+                  background: '#fff', cursor: 'pointer',
+                }}
+              >
+                <option value="">Add to Pack...</option>
+                {packs.map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <button
             onClick={() => onNodeSelect?.(selectedNode)}
             style={{
-              marginTop: 16, width: '100%', padding: '10px 16px',
+              marginTop: 8, width: '100%', padding: '10px 16px',
               background: '#1d1d1f', border: 'none', borderRadius: 8,
               cursor: 'pointer', fontSize: 13, fontWeight: 500, color: '#fff',
             }}

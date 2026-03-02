@@ -11,16 +11,6 @@
     align-items: center;
     justify-content: center;
     z-index: 10000;
-    animation: overlayFadeIn 0.15s ease;
-}
-
-@keyframes overlayFadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
 }
 
 .confirm-dialog {
@@ -33,18 +23,6 @@
     max-width: 400px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-    animation: dialogSlideIn 0.2s ease;
-}
-
-@keyframes dialogSlideIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95) translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
 }
 
 .confirm-title {

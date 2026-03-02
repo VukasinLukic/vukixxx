@@ -1,5 +1,6 @@
 import React, { useRef, useState, useCallback, type ReactNode } from 'react';
 import Draggable from 'react-draggable';
+import { motion } from 'framer-motion';
 import { X, Minus, Maximize2, GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import './DraggablePanel.css';
@@ -112,42 +113,50 @@ export const DraggablePanel: React.FC<DraggablePanelProps> = ({
         style={panelStyle}
         onMouseDown={handlePanelClick}
       >
-        <div className="panel-header">
-          <div className="window-controls">
-            <button
-              className="control-btn close"
-              onClick={(e) => { e.stopPropagation(); onClose?.(); }}
-              title="Close"
-            >
-              <X size={8} />
-            </button>
-            <button className="control-btn minimize" title="Minimize">
-              <Minus size={8} />
-            </button>
-            <button
-              className="control-btn maximize"
-              onClick={(e) => { e.stopPropagation(); handleMaximize(); }}
-              title={isMaximized ? 'Restore' : 'Maximize'}
-            >
-              <Maximize2 size={8} />
-            </button>
+        <motion.div
+          className="panel-inner"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
+          <div className="panel-header">
+            <div className="window-controls">
+              <button
+                className="control-btn close"
+                onClick={(e) => { e.stopPropagation(); onClose?.(); }}
+                title="Close"
+              >
+                <X size={8} />
+              </button>
+              <button className="control-btn minimize" title="Minimize">
+                <Minus size={8} />
+              </button>
+              <button
+                className="control-btn maximize"
+                onClick={(e) => { e.stopPropagation(); handleMaximize(); }}
+                title={isMaximized ? 'Restore' : 'Maximize'}
+              >
+                <Maximize2 size={8} />
+              </button>
+            </div>
+            <span className="panel-title">{title}</span>
+            <div className="header-spacer" />
           </div>
-          <span className="panel-title">{title}</span>
-          <div className="header-spacer" />
-        </div>
-        <div className="panel-content">
-          {children}
-        </div>
+          <div className="panel-content">
+            {children}
+          </div>
 
-        {resizable && !isMaximized && (
-          <div
-            className="resize-handle"
-            onMouseDown={handleResizeStart}
-            title="Drag to resize"
-          >
-            <GripVertical size={12} />
-          </div>
-        )}
+          {resizable && !isMaximized && (
+            <div
+              className="resize-handle"
+              onMouseDown={handleResizeStart}
+              title="Drag to resize"
+            >
+              <GripVertical size={12} />
+            </div>
+          )}
+        </motion.div>
       </div>
     </Draggable>
   );

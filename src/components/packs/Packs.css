@@ -1,0 +1,737 @@
+/* ============================================
+   Memory Packs - Complete Styling
+   ============================================ */
+
+.packs-container {
+  display: flex;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+}
+
+/* --- Sidebar / Pack List --- */
+
+.packs-sidebar {
+  width: 260px;
+  min-width: 260px;
+  border-right: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  background: rgba(255,255,255,0.5);
+}
+
+.packs-sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.packs-sidebar-header h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0;
+}
+
+.packs-sidebar-header button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: #1d1d1f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.packs-sidebar-header button:hover {
+  background: #424245;
+}
+
+.pack-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.pack-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.pack-list-item:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.pack-list-item.active {
+  background: rgba(0,122,255,0.08);
+}
+
+.pack-list-item .pack-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.pack-list-item .pack-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pack-list-item .pack-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1d1d1f;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pack-list-item .pack-meta {
+  font-size: 11px;
+  color: #86868b;
+  display: block;
+  margin-top: 2px;
+}
+
+.pack-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #86868b;
+  text-align: center;
+  gap: 12px;
+}
+
+.pack-list-empty span {
+  font-size: 13px;
+}
+
+/* --- Main Content Area --- */
+
+.packs-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.packs-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #86868b;
+  gap: 16px;
+  text-align: center;
+}
+
+.packs-empty-state h3 {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0;
+}
+
+.packs-empty-state p {
+  font-size: 13px;
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+/* --- Pack Detail --- */
+
+.pack-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.pack-detail-header h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0 0 4px;
+}
+
+.pack-detail-header .pack-description {
+  font-size: 13px;
+  color: #86868b;
+  margin: 0;
+}
+
+.pack-detail-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pack-detail-actions button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.8);
+  font-size: 12px;
+  font-weight: 500;
+  color: #1d1d1f;
+  cursor: pointer;
+  font-family: inherit;
+  backdrop-filter: blur(10px);
+}
+
+.pack-detail-actions button:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.pack-detail-actions button.primary {
+  background: #1d1d1f;
+  color: #fff;
+  border-color: transparent;
+}
+
+.pack-detail-actions button.primary:hover {
+  background: #424245;
+}
+
+.pack-detail-actions button.danger {
+  color: #ff453a;
+  border-color: rgba(255,69,58,0.2);
+}
+
+.pack-detail-actions button.danger:hover {
+  background: rgba(255,69,58,0.06);
+}
+
+/* --- Sections --- */
+
+.pack-section {
+  margin-bottom: 24px;
+}
+
+.pack-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.pack-section-header h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pack-section-header button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 6px;
+  background: none;
+  font-size: 12px;
+  color: #86868b;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.pack-section-header button:hover {
+  color: #1d1d1f;
+  background: rgba(0,0,0,0.04);
+}
+
+/* --- System Role Selector --- */
+
+.role-selector {
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+.role-selector select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #1d1d1f;
+  background: #fff;
+  cursor: pointer;
+}
+
+.role-preview-mini {
+  margin-top: 10px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.06);
+  font-size: 12px;
+  color: #86868b;
+  max-height: 80px;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+/* --- Prompt List in Pack --- */
+
+.pack-prompt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pack-prompt-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 8px;
+  font-family: inherit;
+  transition: box-shadow 0.15s;
+}
+
+.pack-prompt-item:hover {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.pack-prompt-item.dragging {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  background: #fff;
+  z-index: 10;
+}
+
+.pack-prompt-item .drag-handle {
+  color: #c7c7cc;
+  cursor: grab;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.pack-prompt-item .drag-handle:active {
+  cursor: grabbing;
+}
+
+.pack-prompt-item .prompt-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pack-prompt-item .prompt-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1d1d1f;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pack-prompt-item .prompt-category {
+  font-size: 11px;
+  color: #86868b;
+  display: block;
+  margin-top: 2px;
+}
+
+.pack-prompt-item .remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  color: #c7c7cc;
+  cursor: pointer;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.pack-prompt-item .remove-btn:hover {
+  color: #ff453a;
+  background: rgba(255,69,58,0.06);
+}
+
+.pack-prompt-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: #86868b;
+  font-size: 13px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 10px;
+  border: 1px dashed rgba(0,0,0,0.1);
+}
+
+/* --- Add Prompt Picker --- */
+
+.add-prompt-picker {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.add-prompt-picker select {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #1d1d1f;
+  background: #fff;
+}
+
+.add-prompt-picker button {
+  padding: 8px 14px;
+  background: #1d1d1f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.add-prompt-picker button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* --- Token Stats Bar --- */
+
+.token-stats-bar {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+.token-stat {
+  flex: 1;
+  text-align: center;
+}
+
+.token-stat .stat-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d1d1f;
+  display: block;
+}
+
+.token-stat .stat-label {
+  font-size: 11px;
+  color: #86868b;
+  display: block;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.token-stat.savings .stat-value {
+  color: #30d158;
+}
+
+/* --- Export Panel --- */
+
+.export-panel {
+  padding: 16px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+.export-format-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  background: rgba(0,0,0,0.04);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.export-format-tab {
+  flex: 1;
+  padding: 6px 12px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #86868b;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.export-format-tab.active {
+  background: #fff;
+  color: #1d1d1f;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.export-preview {
+  background: #1d1d1f;
+  color: #a1a1a6;
+  border-radius: 8px;
+  padding: 14px;
+  font-family: 'SF Mono', Menlo, Monaco, monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin-bottom: 12px;
+}
+
+.export-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.export-actions button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.export-actions .copy-btn {
+  background: #1d1d1f;
+  color: #fff;
+}
+
+.export-actions .copy-btn:hover {
+  background: #424245;
+}
+
+.export-actions .copy-btn.copied {
+  background: #30d158;
+}
+
+/* --- Pack Editor Dialog --- */
+
+.pack-editor-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.pack-editor-dialog {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px;
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+}
+
+.pack-editor-dialog h3 {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0 0 20px;
+}
+
+.pack-editor-field {
+  margin-bottom: 16px;
+}
+
+.pack-editor-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #86868b;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.pack-editor-field input,
+.pack-editor-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1d1d1f;
+  background: #fafafa;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.pack-editor-field input:focus,
+.pack-editor-field textarea:focus {
+  border-color: rgba(0,122,255,0.4);
+  background: #fff;
+}
+
+.pack-editor-field textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.pack-editor-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.pack-editor-buttons button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.pack-editor-buttons .cancel-btn {
+  background: none;
+  border: 1px solid rgba(0,0,0,0.1);
+  color: #86868b;
+}
+
+.pack-editor-buttons .save-btn {
+  background: #1d1d1f;
+  border: none;
+  color: #fff;
+}
+
+.pack-editor-buttons .save-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* --- Role Components --- */
+
+.role-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.role-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.role-item:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.role-item .role-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.role-item .role-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1d1d1f;
+}
+
+.role-item .role-desc {
+  font-size: 11px;
+  color: #86868b;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.role-item-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.role-item-actions button {
+  padding: 4px;
+  border: none;
+  background: none;
+  color: #86868b;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.role-item-actions button:hover {
+  color: #1d1d1f;
+  background: rgba(0,0,0,0.04);
+}
+
+.role-item-actions button.delete:hover {
+  color: #ff453a;
+}

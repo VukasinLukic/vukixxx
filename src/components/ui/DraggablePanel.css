@@ -1,5 +1,10 @@
 .draggable-panel {
     position: absolute;
+    pointer-events: auto;
+    user-select: none;
+}
+
+.panel-inner {
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -11,20 +16,20 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transition: box-shadow 0.2s, transform 0.1s;
-    pointer-events: auto;
-    user-select: none;
+    transition: box-shadow 0.2s;
+    height: 100%;
+    width: 100%;
 }
 
-.draggable-panel:hover {
+.panel-inner:hover {
     box-shadow:
         0 0 0 1px rgba(0, 0, 0, 0.08),
         0 16px 32px rgba(0, 0, 0, 0.12),
         0 6px 12px rgba(0, 0, 0, 0.06);
 }
 
-.draggable-panel:active,
-.draggable-panel.resizing {
+.draggable-panel:active .panel-inner,
+.draggable-panel.resizing .panel-inner {
     box-shadow:
         0 0 0 1px rgba(0, 0, 0, 0.1),
         0 20px 40px rgba(0, 0, 0, 0.15),

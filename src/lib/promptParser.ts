@@ -92,9 +92,21 @@ export function loadBundledPrompts(): Prompt[] {
 
   for (const path in modules) {
     const rawContent = modules[path];
-    const prompt = parsePromptFile(rawContent, path);
-    prompts.push(prompt);
+
+    if (!rawContent) {
+      console.warn('⚠️ No content found for:', path);
+      continue;
+    }
+
+    try {
+      const prompt = parsePromptFile(rawContent, path);
+      prompts.push(prompt);
+      console.log('✅ Loaded prompt:', prompt.id, prompt.label);
+    } catch (error) {
+      console.error('❌ Error parsing prompt:', path, error);
+    }
   }
 
+  console.log(`📦 Total bundled prompts loaded: ${prompts.length}`);
   return prompts;
 }

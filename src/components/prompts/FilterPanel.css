@@ -1,0 +1,180 @@
+.filter-panel {
+  padding: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(247, 247, 247, 0.5);
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.filter-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #86868b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-reset {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: #0071e3;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: inherit;
+  transition: background 0.1s;
+}
+
+.filter-reset:hover {
+  background: rgba(0, 113, 227, 0.08);
+}
+
+.filter-section {
+  margin-bottom: 12px;
+}
+
+.filter-section:last-child {
+  margin-bottom: 0;
+}
+
+.filter-section-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 8px;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #1d1d1f;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.filter-chip:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.filter-chip.active {
+  border-color: #0071e3;
+  background: rgba(0, 113, 227, 0.08);
+  color: #0071e3;
+}
+
+.filter-chip.tag-chip.active {
+  border-color: #6e6e73;
+  background: rgba(110, 110, 115, 0.1);
+  color: #1d1d1f;
+}
+
+.chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.chip-remove {
+  opacity: 0.6;
+  margin-left: 2px;
+}
+
+.filter-options {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.filter-option {
+  padding: 5px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: white;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #86868b;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.filter-option:hover {
+  color: #1d1d1f;
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.filter-option.active {
+  background: #1d1d1f;
+  color: white;
+  border-color: #1d1d1f;
+}
+
+.filter-sort-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.filter-select {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  color: #1d1d1f;
+  cursor: pointer;
+  outline: none;
+}
+
+.filter-select:focus {
+  border-color: rgba(0, 113, 227, 0.4);
+}
+
+.sort-direction-btn {
+  padding: 6px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: ui-monospace, "SF Mono", monospace;
+  color: #1d1d1f;
+  cursor: pointer;
+  transition: all 0.1s;
+  min-width: 36px;
+  text-align: center;
+}
+
+.sort-direction-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}

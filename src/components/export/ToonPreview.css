@@ -1,0 +1,207 @@
+.toon-preview {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+}
+
+/* Tabs */
+.toon-tabs {
+  display: flex;
+  padding: 8px;
+  gap: 4px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.toon-tab {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #86868b;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.toon-tab:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1d1d1f;
+}
+
+.toon-tab.active {
+  background: #1d1d1f;
+  color: white;
+}
+
+/* Selector */
+.toon-selector {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.toon-selector select {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  color: #1d1d1f;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Stats */
+.toon-stats {
+  padding: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.stat-comparison {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 16px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  min-width: 100px;
+}
+
+.stat-box.toon {
+  border-color: rgba(0, 113, 227, 0.3);
+  background: rgba(0, 113, 227, 0.04);
+}
+
+.stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #86868b;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1d1d1f;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-box.toon .stat-value {
+  color: #0071e3;
+}
+
+.stat-unit {
+  font-size: 10px;
+  color: #86868b;
+}
+
+.stat-arrow {
+  color: #86868b;
+  flex-shrink: 0;
+}
+
+.stat-savings {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: rgba(48, 209, 88, 0.1);
+  border-radius: 20px;
+  color: #30d158;
+}
+
+.savings-value {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.savings-label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.savings-detail {
+  font-size: 11px;
+  color: #86868b;
+  margin-left: 4px;
+}
+
+/* Output Preview */
+.toon-output {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.toon-output-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #86868b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.toon-code {
+  flex: 1;
+  padding: 12px;
+  margin: 0;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #1d1d1f;
+  background: rgba(0, 0, 0, 0.02);
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Copy Button */
+.toon-copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 12px;
+  padding: 10px 20px;
+  border: none;
+  background: #1d1d1f;
+  color: white;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.toon-copy-btn:hover {
+  background: #333;
+}
+
+.toon-copy-btn.copied {
+  background: #30d158;
+}
