@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(npm run build:*)",
-      "Bash(netstat:*)"
+      "Bash(netstat:*)",
+      "Bash(ls:*)",
+      "Bash(dir:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

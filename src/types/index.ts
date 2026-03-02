@@ -1,0 +1,176 @@
+// ============================================================
+// Vukixxx - Core Type Definitions
+// ============================================================
+
+// --- Prompt Domain ---
+
+export type PromptCategory = 'core' | 'design' | 'backend' | 'marketing' | 'other';
+
+export interface PromptFrontmatter {
+  id: string;
+  label: string;
+  parent?: string;
+  category: PromptCategory;
+  type?: 'root' | 'prompt';
+  tags?: string[];
+  created?: string;
+  updated?: string;
+}
+
+export interface Prompt {
+  id: string;
+  label: string;
+  category: PromptCategory;
+  parent?: string;
+  type: 'root' | 'prompt';
+  tags: string[];
+  content: string;         // Full markdown including frontmatter
+  bodyContent: string;     // Markdown body without frontmatter
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePromptInput {
+  id: string;
+  label: string;
+  category: PromptCategory;
+  parent?: string;
+  bodyContent: string;
+  tags?: string[];
+}
+
+export interface UpdatePromptInput {
+  label?: string;
+  category?: PromptCategory;
+  parent?: string;
+  bodyContent?: string;
+  tags?: string[];
+}
+
+// --- Memory Pack Domain (Phase 2) ---
+
+export interface MemoryPack {
+  id: string;
+  name: string;
+  description: string;
+  promptIds: string[];
+  systemRoleId?: string;
+  exportFormat: 'toon' | 'markdown' | 'both';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SystemRole {
+  id: string;
+  name: string;
+  description: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// --- Panel/Window System ---
+
+export interface Position {
+  x: number;
+  y: number;
+}
+
+export interface PanelSize {
+  width: number;
+  height: number | 'auto';
+}
+
+export interface PanelConfig {
+  id: string;
+  title: string;
+  visible: boolean;
+  initialPosition: Position;
+  width: number;
+  height: number | 'auto';
+  zIndex: number;
+}
+
+export interface PromptWindowConfig extends PanelConfig {
+  prompt: Prompt;
+}
+
+export interface EditorPanelConfig extends PanelConfig {
+  mode: 'create' | 'edit';
+  data: Prompt | null;
+}
+
+// --- 3D Graph ---
+
+export interface GraphNode {
+  id: string;
+  name: string;
+  type: 'root' | 'prompt' | 'phantom';
+  category: PromptCategory | 'phantom';
+  val: number;
+  color: string;
+  content?: string;
+  x?: number;
+  y?: number;
+  z?: number;
+}
+
+export interface GraphLink {
+  source: string;
+  target: string;
+}
+
+export interface GraphData {
+  nodes: GraphNode[];
+  links: GraphLink[];
+}
+
+// --- TOON ---
+
+export interface TOONStats {
+  originalLength: number;
+  toonLength: number;
+  originalTokens: number;
+  toonTokens: number;
+  tokensSaved: number;
+  savingsPercent: string;
+}
+
+export interface BatchTOONStats {
+  promptCount: number;
+  totalOriginalTokens: number;
+  totalToonTokens: number;
+  savingsPercent: string;
+}
+
+// --- Toast / UI ---
+
+export type ToastType = 'success' | 'error' | 'info';
+
+export interface Toast {
+  id: number;
+  message: string;
+  type: ToastType;
+  duration: number;
+}
+
+export type TabId = 'dashboard' | 'prompts' | 'memory' | 'packs' | 'settings';
+
+// --- Confirm Dialog ---
+
+export interface ConfirmDialogConfig {
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: 'default' | 'danger';
+  onConfirm: () => void;
+}
+
+// --- App Settings ---
+
+export interface AppSettings {
+  promptsDir: string;
+  theme: 'light' | 'dark';
+  language: 'en' | 'sr';
+}
