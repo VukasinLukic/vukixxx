@@ -54,6 +54,7 @@ export default defineConfig({
       input: {
         main: path.resolve(__dirname, 'index.html'),
         widget: path.resolve(__dirname, 'widget.html'),
+        'save-widget': path.resolve(__dirname, 'save-widget.html'),
       },
     },
   },

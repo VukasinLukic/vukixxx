@@ -109,3 +109,38 @@ export function getConfidenceColor(confidence: number): string {
   if (confidence >= 0.5) return '#ff9500';  // Orange
   return '#ff3b30'; // Red
 }
+
+/**
+ * Generate a short, descriptive title for a prompt using AI
+ */
+export async function generatePromptTitle(content: string): Promise<string> {
+  const store = useAIStore.getState();
+  const provider = await store.getActiveProvider();
+
+  const titlePrompt = `Generate a short, descriptive title (max 6 words) for this prompt. 
+Respond ONLY with the title text, nothing else. No quotes, no explanation.
+
+Prompt content:
+${content.slice(0, 500)}`;
+
+  try {
+    const response = await provider.chat(
+      [{ role: 'user', content: titlePrompt }],
+      { temperature: 0.3, maxTokens: 50 }
+    );
+
+    // Clean up the response
+    const title = response.content
+      .trim()
+      .replace(/^["']|["']$/g, '') // Remove wrapping quotes
+      .replace(/\n/g, ' ')
+      .slice(0, 60);
+
+    return title || 'Untitled Prompt';
+  } catch (error) {
+    console.error('Title generation failed:', error);
+    // Fallback: extract first meaningful line
+    const firstLine = content.trim().split('\n')[0].slice(0, 50).trim();
+    return firstLine || 'Untitled Prompt';
+  }
+}

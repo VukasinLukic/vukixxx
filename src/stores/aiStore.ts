@@ -105,14 +105,17 @@ export const useAIStore = create<AIState>((set, get) => ({
   },
 
   checkProviderStatus: async (id) => {
+    console.log(`🔄 [AIStore] Checking status for provider: ${id}`);
     set(state => ({
       providerStatus: { ...state.providerStatus, [id]: 'checking' as const },
     }));
 
     try {
       const config = get().providers[id];
+      console.log(`🔧 [AIStore] Provider config:`, { id: config.id, enabled: config.enabled, hasApiKey: !!config.apiKey, model: config.model });
       const provider = await createProvider(config);
       const available = await provider.isAvailable();
+      console.log(`📡 [AIStore] Provider ${id} available: ${available}`);
 
       set(state => ({
         providerStatus: {
@@ -120,7 +123,8 @@ export const useAIStore = create<AIState>((set, get) => ({
           [id]: available ? 'available' as const : 'unavailable' as const,
         },
       }));
-    } catch {
+    } catch (err) {
+      console.error(`❌ [AIStore] Provider ${id} check failed:`, err);
       set(state => ({
         providerStatus: { ...state.providerStatus, [id]: 'unavailable' as const },
       }));

@@ -28,6 +28,19 @@ fn show_main_window(app: tauri::AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+#[tauri::command]
+fn toggle_save_widget(app: tauri::AppHandle) -> Result<(), String> {
+    if let Some(widget) = app.get_webview_window("save-widget") {
+        if widget.is_visible().unwrap_or(false) {
+            widget.hide().map_err(|e| e.to_string())?;
+        } else {
+            widget.show().map_err(|e| e.to_string())?;
+            widget.set_focus().map_err(|e| e.to_string())?;
+        }
+    }
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -46,6 +59,7 @@ pub fn run() {
             commands::watcher::start_watcher,
             commands::watcher::stop_watcher,
             toggle_widget,
+            toggle_save_widget,
             show_main_window,
         ])
         .setup(|app| {
@@ -123,6 +137,30 @@ pub fn run() {
             match app.global_shortcut().register(shortcut) {
                 Ok(_) => println!("Global shortcut Ctrl+Shift+V registered successfully"),
                 Err(e) => println!("Warning: Failed to register shortcut (may already be registered): {}", e),
+            }
+
+            // Register Ctrl+Shift+B for save widget toggle
+            let save_shortcut = "Ctrl+Shift+B".parse::<Shortcut>()
+                .map_err(|e| format!("Failed to parse save shortcut: {}", e))?;
+
+            let _ = app.global_shortcut().unregister(save_shortcut);
+
+            let app_handle_save = app.handle().clone();
+            app.global_shortcut().on_shortcut(save_shortcut, move |_app, _event, _shortcut| {
+                if let Some(widget) = app_handle_save.get_webview_window("save-widget") {
+                    let is_visible = widget.is_visible().unwrap_or(false);
+                    if is_visible {
+                        let _ = widget.hide();
+                    } else {
+                        let _ = widget.show();
+                        let _ = widget.set_focus();
+                    }
+                }
+            })?;
+
+            match app.global_shortcut().register(save_shortcut) {
+                Ok(_) => println!("Global shortcut Ctrl+Shift+B registered successfully"),
+                Err(e) => println!("Warning: Failed to register save shortcut: {}", e),
             }
 
             Ok(())

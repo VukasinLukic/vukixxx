@@ -19,14 +19,25 @@ export class GeminiProvider implements LLMProvider {
   }
 
   async isAvailable(): Promise<boolean> {
-    if (!this.apiKey) return false;
+    if (!this.apiKey) {
+      console.warn('🔑 [GeminiProvider] No API key configured');
+      return false;
+    }
     try {
+      const url = `${GEMINI_API_BASE}/models?key=${this.apiKey.slice(0, 4)}...`;
+      console.log(`🔍 [GeminiProvider] Checking availability: ${url}`);
       const res = await fetch(
         `${GEMINI_API_BASE}/models?key=${this.apiKey}`,
         { signal: AbortSignal.timeout(5000) }
       );
+      console.log(`📡 [GeminiProvider] Status: ${res.status} ${res.statusText}`);
+      if (!res.ok) {
+        const errorText = await res.text().catch(() => 'unable to read body');
+        console.error(`❌ [GeminiProvider] Availability check failed: ${res.status} — ${errorText}`);
+      }
       return res.ok;
-    } catch {
+    } catch (err) {
+      console.error('❌ [GeminiProvider] Availability check error:', err);
       return false;
     }
   }
@@ -37,6 +48,7 @@ export class GeminiProvider implements LLMProvider {
     jsonMode?: boolean;
   }): Promise<LLMResponse> {
     if (!this.apiKey) throw new Error('Gemini API key not configured');
+    console.log(`💬 [GeminiProvider] Sending chat request with ${messages.length} messages, model: ${this.model}`);
 
     // Convert chat messages to Gemini format
     const systemInstruction = messages.find(m => m.role === 'system');

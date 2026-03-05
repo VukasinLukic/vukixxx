@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { loadBundledPrompts, parsePromptFile } from '@/lib/promptParser';
-import type { Prompt } from '@/types';
+import { loadBundledPrompts, parsePromptFile, createPromptFromInput, serializePrompt } from '@/lib/promptParser';
+import type { Prompt, CreatePromptInput } from '@/types';
 
 interface PromptFile {
   filename: string;
@@ -81,5 +81,20 @@ export function usePromptLoader() {
     load();
   }, []);
 
-  return { prompts, isLoading, error };
+  const addPrompt = useCallback(async (input: CreatePromptInput): Promise<Prompt> => {
+    const prompt = createPromptFromInput(input);
+    try {
+      const filename = `${prompt.id}.md`;
+      const content = serializePrompt(prompt);
+      await invoke('write_prompt_file', { filename, content });
+      console.log(`✅ [usePromptLoader] Saved new prompt: ${prompt.id} - ${prompt.label}`);
+      setPrompts(prev => [...prev, prompt]);
+    } catch (err) {
+      console.error('❌ [usePromptLoader] Failed to save prompt:', err);
+      throw err;
+    }
+    return prompt;
+  }, []);
+
+  return { prompts, isLoading, error, addPrompt };
 }

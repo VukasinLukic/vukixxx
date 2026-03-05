@@ -1,0 +1,486 @@
+/* Save Widget imports base widget styles via identical class names */
+/* This file adds save-specific styles on top of the shared widget look */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: transparent;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+}
+
+.widget-container {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.widget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(245, 245, 247, 0.8);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    cursor: grab;
+    user-select: none;
+}
+
+.widget-header:active {
+    cursor: grabbing;
+}
+
+.widget-drag-handle {
+    display: flex;
+    align-items: center;
+    color: #c7c7cc;
+    cursor: grab;
+}
+
+.widget-drag-handle:active {
+    cursor: grabbing;
+}
+
+.widget-header-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1d1d1f;
+    letter-spacing: 0.3px;
+    flex: 1;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.widget-header-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.widget-header-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #86868b;
+    transition: all 0.15s ease;
+}
+
+.widget-header-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #1d1d1f;
+}
+
+.widget-header-btn.close:hover {
+    background: rgba(255, 59, 48, 0.15);
+    color: #ff3b30;
+}
+
+.widget-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    gap: 10px;
+    overflow-y: auto;
+}
+
+.widget-footer {
+    padding: 8px 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    justify-content: center;
+}
+
+.widget-open-app-btn {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #007aff;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.widget-open-app-btn:hover {
+    background: #0056b3;
+}
+
+.widget-resize-indicator {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    background: linear-gradient(135deg, transparent 0%, transparent 50%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.1) 100%);
+    border-bottom-right-radius: 16px;
+}
+
+.widget-resize-indicator:hover {
+    background: linear-gradient(135deg, transparent 0%, transparent 50%, rgba(0, 122, 255, 0.3) 50%, rgba(0, 122, 255, 0.3) 100%);
+}
+
+/* ============= Save-specific styles ============= */
+
+.save-input-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 8px;
+}
+
+.save-textarea {
+    flex: 1;
+    min-height: 180px;
+    padding: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    color: #1d1d1f;
+    resize: none;
+    outline: none;
+    line-height: 1.5;
+    transition: all 0.2s ease;
+}
+
+.save-textarea:focus {
+    border-color: #007aff;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+
+.save-textarea::placeholder {
+    color: #c7c7cc;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+}
+
+.save-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.save-char-count {
+    font-size: 10px;
+    color: #86868b;
+}
+
+.save-classify-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #007aff, #5856d6);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.save-classify-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.save-classify-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Loading spinner */
+.save-loading {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #86868b;
+    font-size: 13px;
+}
+
+.save-spinner {
+    animation: spin 1s linear infinite;
+    color: #007aff;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Review section */
+.save-review-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.save-confidence {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 10px;
+    background: rgba(245, 245, 247, 0.8);
+    border-radius: 8px;
+}
+
+.save-error-banner {
+    padding: 8px 10px;
+    background: rgba(255, 59, 48, 0.08);
+    border: 1px solid rgba(255, 59, 48, 0.2);
+    border-radius: 8px;
+    color: #ff3b30;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.save-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.save-field label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #86868b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.save-field input {
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    color: #1d1d1f;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.save-field input:focus {
+    border-color: #007aff;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+
+.save-category-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.save-chip {
+    padding: 4px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    background: rgba(245, 245, 247, 0.8);
+    font-size: 11px;
+    color: #1d1d1f;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.save-chip:hover {
+    background: rgba(0, 122, 255, 0.08);
+    border-color: rgba(0, 122, 255, 0.2);
+}
+
+.save-chip.active {
+    background: rgba(0, 122, 255, 0.15);
+    border-color: #007aff;
+    color: #007aff;
+    font-weight: 600;
+}
+
+.save-preview-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.save-preview-text label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #86868b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.save-preview-text pre {
+    padding: 8px;
+    background: rgba(245, 245, 247, 0.8);
+    border-radius: 8px;
+    font-size: 11px;
+    color: #86868b;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 60px;
+    overflow-y: auto;
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    line-height: 1.4;
+}
+
+.save-review-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.save-back-btn {
+    padding: 8px 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    background: rgba(245, 245, 247, 0.8);
+    font-size: 12px;
+    color: #86868b;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.save-back-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #1d1d1f;
+}
+
+.save-confirm-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #34c759;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.save-confirm-btn:hover:not(:disabled) {
+    background: #2db84d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
+}
+
+.save-confirm-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Success */
+.save-success {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #34c759;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.save-success-icon {
+    animation: successPop 0.3s ease;
+}
+
+@keyframes successPop {
+    0% {
+        transform: scale(0);
+    }
+
+    70% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.save-success-sub {
+    font-size: 11px;
+    font-weight: 400;
+    color: #86868b;
+}
+
+/* Error */
+.save-error {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #ff3b30;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.save-error-icon {
+    animation: successPop 0.3s ease;
+}
+
+.save-error-detail {
+    font-size: 11px;
+    font-weight: 400;
+    color: #86868b;
+    text-align: center;
+    max-width: 80%;
+}
+
+/* Scrollbar */
+.save-review-section::-webkit-scrollbar,
+.save-textarea::-webkit-scrollbar {
+    width: 6px;
+}
+
+.save-review-section::-webkit-scrollbar-track,
+.save-textarea::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.save-review-section::-webkit-scrollbar-thumb,
+.save-textarea::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+}
