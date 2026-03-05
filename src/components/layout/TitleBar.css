@@ -64,3 +64,25 @@
 .titlebar-btn:hover {
   opacity: 0.85;
 }
+
+.titlebar-btn.widget-toggle {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(0, 122, 255, 0.1);
+  color: #007aff;
+  margin-right: 8px;
+}
+
+.titlebar-btn.widget-toggle svg {
+  opacity: 0.8;
+}
+
+.titlebar-btn.widget-toggle:hover {
+  background: rgba(0, 122, 255, 0.18);
+  opacity: 1;
+}
+
+.titlebar-btn.widget-toggle:hover svg {
+  opacity: 1;
+}

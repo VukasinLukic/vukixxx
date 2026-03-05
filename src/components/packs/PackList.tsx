@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Layers, Plus } from 'lucide-react';
+import { Layers, Plus, Upload } from 'lucide-react';
 import { usePackStore } from '@/stores/packStore';
 import { usePromptStore } from '@/stores/promptStore';
+import { useUIStore } from '@/stores/uiStore';
+import { importPackFromFile } from '@/lib/packImportExport';
 import type { MemoryPack } from '@/types';
 
 interface PackListProps {
@@ -14,7 +16,9 @@ export const PackList: React.FC<PackListProps> = ({ onCreatePack }) => {
   const [packs, setPacks] = useState<MemoryPack[]>([]);
   const selectedPackId = usePackStore(s => s.selectedPackId);
   const selectPack = usePackStore(s => s.selectPack);
+  const importPack = usePackStore(s => s.importPack);
   const prompts = usePromptStore(s => s.prompts);
+  const { success, error } = useUIStore();
 
   // Subscribe to packs changes
   useEffect(() => {
@@ -28,14 +32,34 @@ export const PackList: React.FC<PackListProps> = ({ onCreatePack }) => {
     return unsubscribe;
   }, []);
 
+  const handleImportPack = async () => {
+    try {
+      const packData = await importPackFromFile();
+      if (!packData) return; // User cancelled
+
+      const result = await importPack(packData);
+      success(`Pack "${result.pack.name}" imported with ${result.prompts.length} prompts`);
+      selectPack(result.pack.id);
+    } catch (err) {
+      error('Import failed: ' + (err as Error).message);
+      console.error('Pack import failed:', err);
+    }
+  };
+
   return (
     <div className="packs-sidebar">
       <div className="packs-sidebar-header">
         <h3>Memory Packs</h3>
-        <button onClick={onCreatePack}>
-          <Plus size={14} />
-          New
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button onClick={handleImportPack}>
+            <Upload size={14} />
+            Import
+          </button>
+          <button onClick={onCreatePack}>
+            <Plus size={14} />
+            New
+          </button>
+        </div>
       </div>
 
       <div className="pack-list">

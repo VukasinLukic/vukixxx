@@ -1,4 +1,4 @@
-use notify::{Config, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
+use notify::{EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use std::sync::Mutex;
 use tauri::{AppHandle, Emitter, Manager};
 

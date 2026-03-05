@@ -3,7 +3,7 @@ import { ChevronDown, Sparkles } from 'lucide-react';
 import { parsePromptFile } from '@/lib/promptParser';
 import { ALL_CATEGORIES, CATEGORY_CONFIG } from '@/types/categories';
 import { useAIStore } from '@/stores/aiStore';
-import { classifyPrompt } from '@/services/ai/classifier';
+import { classifyPrompt } from '@/services/ai/classificationService';
 import type { Prompt, PromptCategory } from '@/types';
 import './PromptEditor.css';
 
@@ -53,18 +53,30 @@ export const PromptEditor: React.FC<PromptEditorProps> = ({
     if (!formData.label && !formData.content) return;
     setIsClassifying(true);
     try {
-      const provider = await getActiveProvider();
-      const result = await classifyPrompt(provider, formData.label, formData.content);
+      // Combine label and content for classification
+      const contentToClassify = formData.label
+        ? `${formData.label}\n\n${formData.content}`
+        : formData.content;
+
+      const result = await classifyPrompt(contentToClassify);
+
       setFormData(prev => ({
         ...prev,
         category: result.category,
       }));
+
+      // Log additional classification info (tags & confidence)
+      console.log('Classification result:', {
+        category: result.category,
+        tags: result.tags,
+        confidence: result.confidence,
+      });
     } catch (err) {
       console.warn('Auto-classify failed:', err);
     } finally {
       setIsClassifying(false);
     }
-  }, [formData.label, formData.content, getActiveProvider]);
+  }, [formData.label, formData.content]);
 
   useEffect(() => {
     if (initialData) {

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { GripVertical, X, Plus, Edit2, Trash2 } from 'lucide-react';
+import { GripVertical, X, Plus, Edit2, Trash2, Download } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -22,6 +22,7 @@ import { usePromptStore } from '@/stores/promptStore';
 import { useRoleStore } from '@/stores/roleStore';
 import { TokenCounter } from './TokenCounter';
 import { ExportPanel } from './ExportPanel';
+import { exportPackToFile } from '@/lib/packImportExport';
 import type { MemoryPack, Prompt } from '@/types';
 
 // --- Sortable prompt item ---
@@ -123,6 +124,17 @@ export const PackDetail: React.FC<PackDetailProps> = ({ pack, onEdit, onDelete, 
     setShowAddPrompt(false);
   };
 
+  const handleExportPack = async () => {
+    try {
+      const role = pack.systemRoleId ? rolesList.get(pack.systemRoleId) : undefined;
+      await exportPackToFile(pack, prompts, role);
+      onCopySuccess('Pack exported successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      onCopySuccess('Export failed: ' + (error as Error).message);
+    }
+  };
+
   // Prompts not yet in this pack
   const availablePrompts = useMemo(
     () => promptsArray.filter(p => !pack.promptIds.includes(p.id)),
@@ -145,6 +157,10 @@ export const PackDetail: React.FC<PackDetailProps> = ({ pack, onEdit, onDelete, 
           <button onClick={onEdit}>
             <Edit2 size={14} />
             Edit
+          </button>
+          <button onClick={handleExportPack}>
+            <Download size={14} />
+            Export
           </button>
           <button className="danger" onClick={onDelete}>
             <Trash2 size={14} />

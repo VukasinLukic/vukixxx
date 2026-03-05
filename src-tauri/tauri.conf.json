@@ -13,6 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
+        "label": "main",
         "title": "Vukixxx - AI Context Workbench",
         "width": 1280,
         "height": 800,
@@ -20,7 +21,25 @@
         "minHeight": 600,
         "decorations": false,
         "transparent": false,
-        "center": true
+        "center": true,
+        "maximized": true
+      },
+      {
+        "label": "widget",
+        "title": "Vukixxx Widget",
+        "url": "widget.html",
+        "width": 340,
+        "height": 420,
+        "minWidth": 280,
+        "minHeight": 350,
+        "maxWidth": 600,
+        "maxHeight": 800,
+        "decorations": false,
+        "transparent": false,
+        "resizable": true,
+        "alwaysOnTop": true,
+        "visible": false,
+        "skipTaskbar": true
       }
     ],
     "trayIcon": {
@@ -39,7 +58,6 @@
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
-      "icons/icon.icns",
       "icons/icon.ico"
     ],
     "windows": {
@@ -48,17 +66,5 @@
       "timestampUrl": ""
     }
   },
-  "plugins": {
-    "fs": {
-      "scope": {
-        "allow": [
-          "$APPDATA/**",
-          "$HOME/.vukixxx/**"
-        ]
-      }
-    },
-    "global-shortcut": {
-      "shortcuts": ["CmdOrCtrl+Shift+V", "CmdOrCtrl+Shift+C"]
-    }
-  }
+  "plugins": {}
 }

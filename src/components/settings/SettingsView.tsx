@@ -121,6 +121,44 @@ export const SettingsView: React.FC = () => {
           </div>
         </section>
 
+        {/* Keyboard Shortcuts Section */}
+        <section className="settings-section">
+          <h3 className="settings-section-title">Keyboard Shortcuts</h3>
+          <p className="settings-section-desc">
+            Global shortcuts work even when the app is in the background.
+          </p>
+          <div className="settings-about">
+            <div className="about-item">
+              <span className="about-label">Toggle Widget</span>
+              <span className="about-value">
+                <code style={{
+                  padding: '4px 8px',
+                  background: 'rgba(0,0,0,0.05)',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace'
+                }}>
+                  Ctrl+Shift+V
+                </code>
+              </span>
+            </div>
+            <div className="about-item">
+              <span className="about-label">Help</span>
+              <span className="about-value">
+                <code style={{
+                  padding: '4px 8px',
+                  background: 'rgba(0,0,0,0.05)',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace'
+                }}>
+                  F1
+                </code>
+              </span>
+            </div>
+          </div>
+        </section>
+
         {/* About Section */}
         <section className="settings-section">
           <h3 className="settings-section-title">About</h3>

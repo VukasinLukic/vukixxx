@@ -19,8 +19,32 @@ export class ClaudeProvider implements LLMProvider {
   }
 
   async isAvailable(): Promise<boolean> {
-    // Claude API doesn't have a simple health check; just verify key exists
-    return !!this.apiKey;
+    if (!this.apiKey) return false;
+
+    try {
+      // Lightweight test: minimal messages API call
+      const res = await fetch(`${ANTHROPIC_API_BASE}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': this.apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: this.model,
+          max_tokens: 1,
+          messages: [{ role: 'user', content: 'test' }],
+        }),
+        signal: AbortSignal.timeout(5000), // 5s timeout
+      });
+
+      // 200 = success, 400 = validation error but key is valid
+      // We accept both since we're just testing if the key is recognized
+      return res.ok || res.status === 400;
+    } catch {
+      return false;
+    }
   }
 
   async chat(messages: ChatMessage[], options?: {

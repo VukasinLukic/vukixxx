@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Minus, Square, X } from 'lucide-react';
+import { Minus, Square, X, Layers } from 'lucide-react';
 import './TitleBar.css';
 
 /**
@@ -30,6 +30,15 @@ export const TitleBar: React.FC = () => {
     getCurrentWindow().close();
   }, []);
 
+  const handleToggleWidget = useCallback(async () => {
+    try {
+      const { invoke } = await import('@tauri-apps/api/core');
+      await invoke('toggle_widget');
+    } catch (e) {
+      console.warn('Failed to toggle widget:', e);
+    }
+  }, []);
+
   if (!isTauri) return null;
 
   return (
@@ -38,6 +47,9 @@ export const TitleBar: React.FC = () => {
         Vukixxx
       </div>
       <div className="titlebar-buttons">
+        <button className="titlebar-btn widget-toggle" onClick={handleToggleWidget} title="Toggle Widget">
+          <Layers size={11} />
+        </button>
         <button className="titlebar-btn minimize" onClick={handleMinimize} title="Minimize">
           <Minus size={12} />
         </button>

@@ -13,17 +13,22 @@ import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { GraphErrorBoundary } from './components/ui/GraphErrorBoundary';
 import { MemoryPacksView } from './components/packs/MemoryPacksView';
 import { SettingsView } from './components/settings/SettingsView';
+import { HelpModal } from './components/help/HelpModal';
 import { usePromptStore } from './stores/promptStore';
 import { usePanelStore } from './stores/panelStore';
 import { useUIStore } from './stores/uiStore';
+import { useAIStore } from './stores/aiStore';
 import { initTauri } from './lib/tauriSetup';
 import type { Prompt, GraphNode } from './types';
 
 function App() {
+  const [helpModalOpen, setHelpModalOpen] = React.useState(false);
+
   // --- Zustand stores ---
   const {
     prompts,
     loadPrompts,
+    initWatcher,
     addPrompt,
     updatePrompt,
     deletePrompt,
@@ -55,11 +60,15 @@ function App() {
     hideConfirm,
   } = useUIStore();
 
-  // Load prompts on mount + initialize Tauri
+  const { loadProvidersFromDisk } = useAIStore();
+
+  // Load prompts and AI providers on mount + initialize Tauri
   useEffect(() => {
     loadPrompts();
+    loadProvidersFromDisk();
+    initWatcher(); // Auto-reload prompts when files change
     initTauri(setActiveTab);
-  }, [loadPrompts, setActiveTab]);
+  }, [loadPrompts, loadProvidersFromDisk, initWatcher, setActiveTab]);
 
   // Show browser when prompts tab is active
   useEffect(() => {
@@ -67,6 +76,19 @@ function App() {
       showPanel('browser');
     }
   }, [activeTab, showPanel]);
+
+  // F1 keyboard listener for help modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F1') {
+        e.preventDefault();
+        setHelpModalOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // --- Event handlers ---
 
@@ -183,7 +205,7 @@ function App() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}
+              style={{ position: 'absolute', top: 36, left: 0, width: '100%', height: 'calc(100% - 116px)', zIndex: 1 }}
             >
               <GraphErrorBoundary>
                 <MemoryGraph
@@ -203,8 +225,8 @@ function App() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.25 }}
               style={{
-                position: 'absolute', top: 0, left: 0, width: '100%',
-                height: 'calc(100% - 80px)', zIndex: 2,
+                position: 'absolute', top: 36, left: 0, width: '100%',
+                height: 'calc(100% - 116px)', zIndex: 2,
                 background: 'rgba(245,245,247,0.95)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
@@ -223,8 +245,8 @@ function App() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.25 }}
               style={{
-                position: 'absolute', top: 0, left: 0, width: '100%',
-                height: 'calc(100% - 80px)', zIndex: 2,
+                position: 'absolute', top: 36, left: 0, width: '100%',
+                height: 'calc(100% - 116px)', zIndex: 2,
                 background: 'rgba(245,245,247,0.95)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
@@ -239,8 +261,8 @@ function App() {
         <div
           className="panels-layer"
           style={{
-            position: 'absolute', top: 0, left: 0,
-            width: '100%', height: 'calc(100% - 80px)',
+            position: 'absolute', top: 36, left: 0,
+            width: '100%', height: 'calc(100% - 116px)',
             pointerEvents: 'none', zIndex: 50,
           }}
         >
@@ -342,6 +364,12 @@ function App() {
 
         {/* Toast Notifications */}
         <ToastContainer toasts={toasts} removeToast={removeToast} />
+
+        {/* Help Modal */}
+        <HelpModal
+          isOpen={helpModalOpen}
+          onClose={() => setHelpModalOpen(false)}
+        />
       </div>
     </ErrorBoundary>
   );

@@ -20,7 +20,16 @@
       "Bash(npm run tauri:dev:*)",
       "Bash(ping:*)",
       "Bash(curl:*)",
-      "Bash(where.exe:*)"
+      "Bash(where.exe:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(tasklist:*)",
+      "Bash(cargo clean:*)",
+      "Bash(powershell.exe -Command \"Add-MpPreference -ExclusionPath ''C:\\\\Vukixxx\\\\src-tauri\\\\target''\")",
+      "WebFetch(domain:v2.tauri.app)",
+      "WebFetch(domain:docs.rs)",
+      "Bash(npm run tauri:*)",
+      "Bash(cargo tauri build:*)"
     ]
   }
 }

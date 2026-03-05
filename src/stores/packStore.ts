@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { MemoryPack, Prompt } from '@/types';
 import { createStorageAdapter } from '@/services/storage/createAdapter';
 import { promptsToBatchTOON, estimateTokens } from '@/lib/toonConverter';
+import type { PackExportFormat } from '@/lib/packImportExport';
 
 const storage = createStorageAdapter();
 
@@ -25,6 +26,7 @@ interface PackState {
   createPack: (name: string, description?: string) => Promise<MemoryPack>;
   updatePack: (id: string, updates: Partial<Pick<MemoryPack, 'name' | 'description' | 'exportFormat' | 'systemRoleId'>>) => Promise<MemoryPack>;
   deletePack: (id: string) => Promise<void>;
+  importPack: (packData: PackExportFormat) => Promise<{ pack: MemoryPack; prompts: Prompt[] }>;
   selectPack: (id: string | null) => void;
 
   // Prompt management within packs
@@ -108,6 +110,44 @@ export const usePackStore = create<PackState>((set, get) => ({
       const selectedPackId = state.selectedPackId === id ? null : state.selectedPackId;
       return { packs: newMap, selectedPackId };
     });
+  },
+
+  importPack: async (packData) => {
+    // Generate new IDs to avoid conflicts
+    const now = new Date().toISOString();
+    const newPackId = generateId();
+
+    // Import prompts first
+    const importedPrompts: Prompt[] = [];
+    for (const prompt of packData.prompts) {
+      await storage.savePrompt(prompt);
+      importedPrompts.push(prompt);
+    }
+
+    // Create pack with original prompt IDs (they're already unique)
+    const importedPack: MemoryPack = {
+      ...packData.pack,
+      id: newPackId, // Use new ID to avoid conflicts
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    // Save pack to storage
+    await storage.savePack(importedPack);
+
+    // Save system role if present
+    if (packData.systemRole) {
+      await storage.saveSystemRole(packData.systemRole);
+    }
+
+    // Update state
+    set(state => {
+      const newMap = new Map(state.packs);
+      newMap.set(importedPack.id, importedPack);
+      return { packs: newMap };
+    });
+
+    return { pack: importedPack, prompts: importedPrompts };
   },
 
   selectPack: (id) => set({ selectedPackId: id }),

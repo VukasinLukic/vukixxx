@@ -49,7 +49,13 @@ export default defineConfig({
     chunkSizeWarningLimit: 2000,
     commonjsOptions: {
       transformMixedEsModules: true,
-    }
+    },
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        widget: path.resolve(__dirname, 'widget.html'),
+      },
+    },
   },
 
   // Tauri: env prefix for TAURI_ variables

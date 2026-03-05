@@ -3,6 +3,7 @@ import Fuse from 'fuse.js';
 import type { Prompt, PromptCategory, CreatePromptInput, UpdatePromptInput, PromptFilters, DateRange } from '@/types';
 import { loadBundledPrompts, createPromptFromInput, serializePrompt } from '@/lib/promptParser';
 import { createStorageAdapter } from '@/services/storage/createAdapter';
+import { debounce } from '@/utils/debounce';
 
 const storage = createStorageAdapter();
 
@@ -33,6 +34,7 @@ interface PromptState {
 
   // Actions
   loadPrompts: () => Promise<void>;
+  initWatcher: () => Promise<void>;
   addPrompt: (input: CreatePromptInput) => Promise<Prompt>;
   updatePrompt: (id: string, updates: UpdatePromptInput) => Promise<Prompt>;
   deletePrompt: (id: string) => Promise<void>;
@@ -84,6 +86,28 @@ export const usePromptStore = create<PromptState>((set, get) => ({
         error: err instanceof Error ? err.message : 'Failed to load prompts',
         isLoading: false,
       });
+    }
+  },
+
+  initWatcher: async () => {
+    // Check if storage has watcher capability
+    if ('startWatcher' in storage && typeof storage.startWatcher === 'function') {
+      try {
+        // Debounce reload to avoid rapid successive reloads
+        const debouncedReload = debounce(() => {
+          console.log('File change detected, reloading prompts...');
+          get().loadPrompts();
+        }, 500);
+
+        // Start watching for file changes
+        await storage.startWatcher((event: any) => {
+          debouncedReload();
+        });
+
+        console.log('File watcher initialized');
+      } catch (error) {
+        console.warn('Failed to initialize file watcher:', error);
+      }
     }
   },
 

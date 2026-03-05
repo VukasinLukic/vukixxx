@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import type { LLMProviderId, LLMProviderConfig } from '@/types';
 import { createProvider, type LLMProvider } from '@/services/ai/LLMProvider';
+import { createStorageAdapter } from '@/services/storage/createAdapter';
+
+const storage = createStorageAdapter();
 
 const DEFAULT_PROVIDERS: Record<LLMProviderId, LLMProviderConfig> = {
   ollama: {
@@ -33,8 +36,9 @@ interface AIState {
   isProcessing: boolean;
 
   // Actions
-  setActiveProvider: (id: LLMProviderId) => void;
-  updateProviderConfig: (id: LLMProviderId, updates: Partial<LLMProviderConfig>) => void;
+  loadProvidersFromDisk: () => Promise<void>;
+  setActiveProvider: (id: LLMProviderId) => Promise<void>;
+  updateProviderConfig: (id: LLMProviderId, updates: Partial<LLMProviderConfig>) => Promise<void>;
   checkProviderStatus: (id: LLMProviderId) => Promise<void>;
   checkAllProviders: () => Promise<void>;
   getActiveProvider: () => Promise<LLMProvider>;
@@ -51,14 +55,54 @@ export const useAIStore = create<AIState>((set, get) => ({
   },
   isProcessing: false,
 
-  setActiveProvider: (id) => set({ activeProviderId: id }),
+  loadProvidersFromDisk: async () => {
+    try {
+      const settings = await storage.loadSettings();
+      if (settings?.aiProviders) {
+        set({
+          providers: settings.aiProviders,
+          activeProviderId: settings.aiProvider || 'ollama',
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to load AI providers from disk:', error);
+    }
+  },
 
-  updateProviderConfig: (id, updates) => set(state => ({
-    providers: {
-      ...state.providers,
-      [id]: { ...state.providers[id], ...updates },
-    },
-  })),
+  setActiveProvider: async (id) => {
+    set({ activeProviderId: id });
+
+    // Persist to disk
+    try {
+      const currentSettings = await storage.loadSettings() || {};
+      await storage.saveSettings({
+        ...currentSettings,
+        aiProvider: id,
+      });
+    } catch (error) {
+      console.warn('Failed to save active provider:', error);
+    }
+  },
+
+  updateProviderConfig: async (id, updates) => {
+    set(state => ({
+      providers: {
+        ...state.providers,
+        [id]: { ...state.providers[id], ...updates },
+      },
+    }));
+
+    // Persist to disk
+    try {
+      const currentSettings = await storage.loadSettings() || {};
+      await storage.saveSettings({
+        ...currentSettings,
+        aiProviders: get().providers,
+      });
+    } catch (error) {
+      console.warn('Failed to save provider config:', error);
+    }
+  },
 
   checkProviderStatus: async (id) => {
     set(state => ({

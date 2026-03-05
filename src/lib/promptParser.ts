@@ -82,11 +82,18 @@ export function createPromptFromInput(input: CreatePromptInput): Prompt {
 }
 
 export function loadBundledPrompts(): Prompt[] {
+  console.log('📦 [loadBundledPrompts] Starting to load bundled prompts...');
+
   const modules = import.meta.glob('../prompts/*.md', {
     query: '?raw',
     import: 'default',
     eager: true,
   }) as Record<string, string>;
+
+  console.log('📦 [loadBundledPrompts] import.meta.glob result:', {
+    paths: Object.keys(modules),
+    count: Object.keys(modules).length
+  });
 
   const prompts: Prompt[] = [];
 
@@ -94,19 +101,24 @@ export function loadBundledPrompts(): Prompt[] {
     const rawContent = modules[path];
 
     if (!rawContent) {
-      console.warn('⚠️ No content found for:', path);
+      console.warn('⚠️ [loadBundledPrompts] No content found for:', path);
       continue;
     }
 
     try {
       const prompt = parsePromptFile(rawContent, path);
       prompts.push(prompt);
-      console.log('✅ Loaded prompt:', prompt.id, prompt.label);
+      console.log(`✅ [loadBundledPrompts] Loaded: ${prompt.id} - ${prompt.label}`);
     } catch (error) {
-      console.error('❌ Error parsing prompt:', path, error);
+      console.error(`❌ [loadBundledPrompts] Error parsing ${path}:`, error);
     }
   }
 
-  console.log(`📦 Total bundled prompts loaded: ${prompts.length}`);
+  console.log(`📦 [loadBundledPrompts] Total bundled prompts loaded: ${prompts.length}`);
+
+  if (prompts.length === 0) {
+    console.error('💥 [loadBundledPrompts] WARNING: No bundled prompts were loaded! This is a critical issue.');
+  }
+
   return prompts;
 }
