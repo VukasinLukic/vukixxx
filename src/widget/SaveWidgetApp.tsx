@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { X, Maximize2, GripVertical, Save, Sparkles, Loader2, Check, AlertCircle, Edit3 } from 'lucide-react';
 import { classifyPrompt, generatePromptTitle, getConfidenceColor, getConfidenceLabel } from '@/services/ai/classificationService';
+import { useAIStore } from '@/stores/aiStore';
 import { usePromptLoader } from '@/hooks/usePromptLoader';
 import type { PromptCategory } from '@/types';
 import './SaveWidgetApp.css';
@@ -21,6 +22,12 @@ export const SaveWidgetApp: React.FC = () => {
     const [savedCount, setSavedCount] = useState(0);
 
     const { addPrompt } = usePromptLoader();
+
+    // Load AI provider settings from disk (save widget is a separate window with its own JS context)
+    useEffect(() => {
+        console.log('🔧 [SaveWidget] Loading AI provider settings from disk...');
+        useAIStore.getState().loadProvidersFromDisk();
+    }, []);
 
     const handleClassify = useCallback(async () => {
         if (!promptText.trim()) return;

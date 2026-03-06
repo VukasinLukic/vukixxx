@@ -9,6 +9,10 @@ pub struct AppSettings {
     pub prompts_dir: String,
     pub theme: String,
     pub language: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ai_provider: Option<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ai_providers: Option<serde_json::Value>,
 }
 
 impl Default for AppSettings {
@@ -17,6 +21,8 @@ impl Default for AppSettings {
             prompts_dir: String::new(),
             theme: "light".to_string(),
             language: "en".to_string(),
+            ai_provider: None,
+            ai_providers: None,
         }
     }
 }
