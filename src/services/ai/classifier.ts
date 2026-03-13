@@ -6,19 +6,26 @@ const CLASSIFICATION_PROMPT = `You are a prompt classifier for an AI Context Wor
 Given a prompt's title and content, classify it into exactly ONE category and suggest relevant tags.
 
 Categories:
-- core: Foundational system prompts, meta-instructions, base behaviors
-- design: UI/UX, visual design, frontend styling, component design
-- backend: Server-side logic, APIs, databases, infrastructure, DevOps
-- marketing: Content creation, copywriting, SEO, social media, branding
-- other: Anything that doesn't clearly fit above
+- core: System prompts, meta-prompts, AI instructions, role definitions, agent configs
+- coding: Programming, code review, debugging, algorithms, refactoring, testing
+- frontend: React, CSS, HTML, UI components, web apps, mobile UI, responsive design
+- backend: APIs, servers, databases, DevOps, infrastructure, authentication, deployment
+- design: UI/UX design, wireframes, visual design, design systems, prototyping
+- writing: Copywriting, content creation, editing, blog posts, documentation, emails
+- marketing: SEO, ads, social media, growth, analytics, landing pages, conversion
+- data: Data analysis, machine learning, data science, SQL, visualization, statistics
+- business: Strategy, planning, management, product, finance, operations, consulting
+- creative: Art, brainstorming, storytelling, creative writing, image prompts, ideas
+- other: Does not fit any above category
 
 Rules:
 - Return a JSON object with: category (string), tags (string array, max 5), confidence (number 0-1)
 - Tags should be lowercase, single-word or hyphenated
 - Be concise with tags - only include highly relevant ones
+- "coding" = general programming. "frontend" = UI/web specific. "backend" = server/API specific.
 
 Example output:
-{"category":"backend","tags":["api","rest","authentication"],"confidence":0.85}`;
+{"category":"coding","tags":["code-review","debugging","best-practices"],"confidence":0.85}`;
 
 /**
  * Auto-classify a prompt using an LLM provider.
@@ -43,7 +50,10 @@ export async function classifyPrompt(
     const parsed = JSON.parse(response.content);
 
     // Validate category
-    const validCategories: PromptCategory[] = ['core', 'design', 'backend', 'marketing', 'other'];
+    const validCategories: PromptCategory[] = [
+      'core', 'coding', 'design', 'frontend', 'backend',
+      'writing', 'marketing', 'data', 'business', 'creative', 'other',
+    ];
     const category = validCategories.includes(parsed.category) ? parsed.category : 'other';
 
     // Validate tags

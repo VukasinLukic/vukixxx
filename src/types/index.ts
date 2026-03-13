@@ -4,7 +4,7 @@
 
 // --- Prompt Domain ---
 
-export type PromptCategory = 'core' | 'design' | 'backend' | 'marketing' | 'other';
+export type PromptCategory = 'core' | 'coding' | 'design' | 'backend' | 'frontend' | 'marketing' | 'writing' | 'data' | 'business' | 'creative' | 'other';
 
 export interface PromptFrontmatter {
   id: string;

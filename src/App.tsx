@@ -66,26 +66,31 @@ function App() {
 
   // Load prompts and AI providers on mount + initialize Tauri + Firebase
   useEffect(() => {
-    loadPrompts();
-    loadProvidersFromDisk();
-    initWatcher(); // Auto-reload prompts when files change
-    initTauri(setActiveTab);
+    async function init() {
+      // Load prompts and AI providers FIRST (classification needs API keys)
+      await Promise.all([
+        loadPrompts(),
+        loadProvidersFromDisk(),
+      ]);
 
-    // Initialize Firebase and start syncing prompts from extension
-    try {
-      initializeFirebase();
-      promptSyncService.startSync((newPrompt) => {
-        // When new prompt arrives from Firebase, reload prompts to include it
-        console.log('📥 [App] New prompt synced from extension:', newPrompt.label);
-        loadPrompts(); // Refresh prompt list
-        success(`New prompt synced: ${newPrompt.label}`);
-      });
-    } catch (error) {
-      console.warn('⚠️ [App] Firebase initialization failed:', error);
-      // Don't block app if Firebase fails - it's an optional feature
+      initWatcher();
+      initTauri(setActiveTab);
+
+      // Initialize Firebase AFTER providers are loaded
+      try {
+        initializeFirebase();
+        promptSyncService.startSync((newPrompt) => {
+          console.log('📥 [App] New prompt synced from extension:', newPrompt.label);
+          loadPrompts();
+          success(`New prompt synced: ${newPrompt.label}`);
+        });
+      } catch (error) {
+        console.warn('⚠️ [App] Firebase initialization failed:', error);
+      }
     }
 
-    // Cleanup: stop Firebase sync on unmount
+    init();
+
     return () => {
       promptSyncService.stopSync();
     };

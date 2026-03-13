@@ -24,8 +24,7 @@ export class GeminiProvider implements LLMProvider {
       return false;
     }
     try {
-      const url = `${GEMINI_API_BASE}/models?key=${this.apiKey.slice(0, 4)}...`;
-      console.log(`🔍 [GeminiProvider] Checking availability: ${url}`);
+      console.log(`🔍 [GeminiProvider] Checking availability...`);
       const res = await fetch(
         `${GEMINI_API_BASE}/models?key=${this.apiKey}`,
         { signal: AbortSignal.timeout(5000) }

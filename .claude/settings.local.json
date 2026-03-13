@@ -29,7 +29,10 @@
       "WebFetch(domain:v2.tauri.app)",
       "WebFetch(domain:docs.rs)",
       "Bash(npm run tauri:*)",
-      "Bash(cargo tauri build:*)"
+      "Bash(cargo tauri build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite build:*)",
+      "Bash(git -C c:/Vukixxx check-ignore:*)"
     ]
   }
 }

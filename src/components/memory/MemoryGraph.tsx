@@ -19,8 +19,8 @@ function buildGraphData(prompts: Prompt[]): GraphData {
       name,
       type,
       category: category as GraphNode['category'],
-      val: NODE_SIZES[type] || NODE_SIZES.prompt,
-      color: GRAPH_COLORS[category] || GRAPH_COLORS[type] || GRAPH_COLORS.other,
+      val: NODE_SIZES[category] || NODE_SIZES[type] || NODE_SIZES.prompt,
+      color: GRAPH_COLORS[category] || GRAPH_COLORS.other,
       content,
     });
     nodeIds.add(id);

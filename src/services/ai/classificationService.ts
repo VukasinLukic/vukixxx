@@ -1,5 +1,6 @@
 import { useAIStore } from '@/stores/aiStore';
 import { createProvider } from './LLMProvider';
+import { classificationLimiter } from '@/utils/rateLimiter';
 import type { PromptCategory, LLMProviderId } from '@/types';
 import type { LLMProvider } from './LLMProvider';
 
@@ -31,7 +32,6 @@ async function getAvailableProvider(): Promise<LLMProvider> {
   console.log(`🔍 [Classification] All providers:`, Object.entries(providers).map(([id, cfg]) => ({
     id,
     hasApiKey: !!cfg.apiKey,
-    apiKeyPrefix: cfg.apiKey ? cfg.apiKey.slice(0, 6) + '...' : 'none',
     model: cfg.model,
     enabled: cfg.enabled,
   })));
@@ -86,9 +86,29 @@ async function getAvailableProvider(): Promise<LLMProvider> {
  */
 const CLASSIFICATION_SYSTEM = `You are a JSON-only classifier. You MUST respond with ONLY a raw JSON object. No text before or after. No markdown. No explanation. Just the JSON object.`;
 
-const CLASSIFICATION_PROMPT = `Classify this prompt. Categories: core, design, backend, marketing, other.
+const CLASSIFICATION_PROMPT = `Classify this prompt into exactly ONE category. Pick the BEST match:
+
+- core: System prompts, meta-prompts, AI instructions, role definitions, agent configs
+- coding: Programming, code review, debugging, algorithms, refactoring, testing
+- frontend: React, CSS, HTML, UI components, web apps, mobile UI, responsive design
+- backend: APIs, servers, databases, DevOps, infrastructure, authentication, deployment
+- design: UI/UX design, wireframes, visual design, design systems, prototyping
+- writing: Copywriting, content creation, editing, blog posts, documentation, emails
+- marketing: SEO, ads, social media, growth, analytics, landing pages, conversion
+- data: Data analysis, machine learning, data science, SQL, visualization, statistics
+- business: Strategy, planning, management, product, finance, operations, consulting
+- creative: Art, brainstorming, storytelling, creative writing, image prompts, ideas
+- other: Does not fit any above category
+
+Rules:
+- "coding" = general programming. "frontend" = UI/web specific. "backend" = server/API specific.
+- If a prompt is about code review or debugging, use "coding".
+- If a prompt is about React/CSS/HTML components, use "frontend".
+- If a prompt is about APIs/databases/servers, use "backend".
+- Generate 2-5 relevant tags (lowercase, short).
+
 Respond with ONLY this JSON (nothing else):
-{"category":"backend","tags":["api","rest"],"confidence":0.85}
+{"category":"coding","tags":["code-review","debugging"],"confidence":0.85}
 
 Prompt to classify:
 `;
@@ -98,14 +118,14 @@ Prompt to classify:
  * Returns suggested category, tags, and confidence score
  */
 export async function classifyPrompt(content: string): Promise<ClassificationResult> {
-  const provider = await getAvailableProvider();
+  return classificationLimiter.wrap(async () => {
+    const provider = await getAvailableProvider();
 
-  // Build classification request
-  // Only send first 500 chars — AI just needs enough to classify
-  const truncated = content.length > 500 ? content.slice(0, 500) + '...' : content;
-  const fullPrompt = CLASSIFICATION_PROMPT + '\n\n' + truncated;
+    // Build classification request
+    // Only send first 500 chars — AI just needs enough to classify
+    const truncated = content.length > 500 ? content.slice(0, 500) + '...' : content;
+    const fullPrompt = CLASSIFICATION_PROMPT + '\n\n' + truncated;
 
-  try {
     const response = await provider.chat(
       [
         { role: 'system', content: CLASSIFICATION_SYSTEM },
@@ -146,7 +166,10 @@ export async function classifyPrompt(content: string): Promise<ClassificationRes
     }
 
     // Validate category
-    const validCategories: PromptCategory[] = ['core', 'design', 'backend', 'marketing', 'other'];
+    const validCategories: PromptCategory[] = [
+      'core', 'coding', 'design', 'frontend', 'backend',
+      'writing', 'marketing', 'data', 'business', 'creative', 'other',
+    ];
     if (!validCategories.includes(result.category)) {
       result.category = 'other';
     }
@@ -170,10 +193,7 @@ export async function classifyPrompt(content: string): Promise<ClassificationRes
       tags: result.tags,
       confidence: result.confidence,
     };
-  } catch (error) {
-    console.error('Classification failed:', error);
-    throw new Error('Failed to classify prompt. Please check your AI provider settings.');
-  }
+  });
 }
 
 /**
@@ -200,31 +220,31 @@ export function getConfidenceColor(confidence: number): string {
  * Generate a short, descriptive title for a prompt using AI
  */
 export async function generatePromptTitle(content: string): Promise<string> {
-  const provider = await getAvailableProvider();
+  try {
+    return await classificationLimiter.wrap(async () => {
+      const provider = await getAvailableProvider();
 
-  const titlePrompt = `Generate a short, descriptive title (max 6 words) for this prompt. 
+      const titlePrompt = `Generate a short, descriptive title (max 6 words) for this prompt.
 Respond ONLY with the title text, nothing else. No quotes, no explanation.
 
 Prompt content:
 ${content.slice(0, 500)}`;
 
-  try {
-    const response = await provider.chat(
-      [{ role: 'user', content: titlePrompt }],
-      { temperature: 0.3, maxTokens: 50 }
-    );
+      const response = await provider.chat(
+        [{ role: 'user', content: titlePrompt }],
+        { temperature: 0.3, maxTokens: 50 }
+      );
 
-    // Clean up the response
-    const title = response.content
-      .trim()
-      .replace(/^["']|["']$/g, '') // Remove wrapping quotes
-      .replace(/\n/g, ' ')
-      .slice(0, 60);
+      const title = response.content
+        .trim()
+        .replace(/^["']|["']$/g, '')
+        .replace(/\n/g, ' ')
+        .slice(0, 60);
 
-    return title || 'Untitled Prompt';
+      return title || 'Untitled Prompt';
+    });
   } catch (error) {
     console.error('Title generation failed:', error);
-    // Fallback: extract first meaningful line
     const firstLine = content.trim().split('\n')[0].slice(0, 50).trim();
     return firstLine || 'Untitled Prompt';
   }

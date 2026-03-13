@@ -1,7 +1,10 @@
 import matter from 'gray-matter';
 import type { Prompt, PromptCategory, CreatePromptInput } from '@/types';
 
-const VALID_CATEGORIES: PromptCategory[] = ['core', 'design', 'backend', 'marketing', 'other'];
+const VALID_CATEGORIES: PromptCategory[] = [
+  'core', 'coding', 'design', 'frontend', 'backend',
+  'writing', 'marketing', 'data', 'business', 'creative', 'other',
+];
 
 function normalizeCategory(value: string | undefined): PromptCategory {
   if (value && VALID_CATEGORIES.includes(value as PromptCategory)) {

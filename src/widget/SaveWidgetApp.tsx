@@ -4,11 +4,12 @@ import { classifyPrompt, generatePromptTitle, getConfidenceColor, getConfidenceL
 import { useAIStore } from '@/stores/aiStore';
 import { usePromptLoader } from '@/hooks/usePromptLoader';
 import type { PromptCategory } from '@/types';
+import { ALL_CATEGORIES } from '@/types/categories';
 import './SaveWidgetApp.css';
 
 type SaveStep = 'input' | 'classifying' | 'review' | 'saving' | 'success' | 'error';
 
-const CATEGORIES: PromptCategory[] = ['core', 'design', 'backend', 'marketing', 'other'];
+const CATEGORIES: PromptCategory[] = ALL_CATEGORIES;
 
 export const SaveWidgetApp: React.FC = () => {
     const [step, setStep] = useState<SaveStep>('input');
