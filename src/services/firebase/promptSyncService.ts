@@ -43,6 +43,26 @@ class PromptSyncService {
   private isClassifying = false;
 
   /**
+   * Check if a Firebase prompt is a content duplicate of an existing local prompt
+   * Deduplicates by comparing first 120 chars of content + first 60 chars of title
+   */
+  private async isDuplicateContent(firebasePrompt: FirebasePrompt): Promise<boolean> {
+    try {
+      const localPrompts = await storage.loadAllPrompts();
+      const fbTextSnippet = firebasePrompt.text.substring(0, 120).trim().toLowerCase();
+      const fbTitleSnippet = firebasePrompt.title.substring(0, 60).trim().toLowerCase();
+
+      return localPrompts.some(p => {
+        const localTextSnippet = p.bodyContent.substring(0, 120).trim().toLowerCase();
+        const localTitleSnippet = p.label.substring(0, 60).trim().toLowerCase();
+        return fbTextSnippet === localTextSnippet && fbTitleSnippet === localTitleSnippet;
+      });
+    } catch {
+      return false; // If we can't check, assume not a duplicate
+    }
+  }
+
+  /**
    * Load existing local prompt IDs to prevent duplicates across restarts
    */
   private async loadLocalPromptIds(): Promise<void> {
@@ -82,14 +102,26 @@ class PromptSyncService {
 
       this.unsubscribe = onSnapshot(
         q,
-        (snapshot) => {
-          snapshot.docChanges().forEach((change) => {
+        async (snapshot) => {
+          snapshot.docChanges().forEach(async (change) => {
             if (change.type === 'added') {
               const docRef = change.doc;
               const localId = `fb-${docRef.id}`;
 
               // Skip if already processed this session
               if (this.processedIds.has(docRef.id)) {
+                return;
+              }
+
+              const firebasePrompt = this.docToFirebasePrompt(docRef);
+
+              // Check for content-based duplicates (same first 120 chars of text)
+              const isDuplicate = await this.isDuplicateContent(firebasePrompt);
+              if (isDuplicate) {
+                this.processedIds.add(docRef.id);
+                if (!this.isInitialized) {
+                  console.log(`⏭️ [FirebaseSync] Content duplicate detected, skipping: ${docRef.id}`);
+                }
                 return;
               }
 
@@ -101,8 +133,6 @@ class PromptSyncService {
                 }
                 return;
               }
-
-              const firebasePrompt = this.docToFirebasePrompt(docRef);
 
               if (!this.isInitialized) {
                 console.log(`📥 [FirebaseSync] Loading existing prompt: ${firebasePrompt.title}`);
@@ -266,6 +296,42 @@ class PromptSyncService {
 
     console.log(`✅ [FirebaseSync] Batch classification complete: ${classified}/${total} classified`);
     return classified;
+  }
+
+  /**
+   * Remove duplicate prompts from local storage (by content comparison)
+   * Call once at app startup to clean up duplicates from previous sync errors
+   */
+  async cleanupDuplicates(): Promise<number> {
+    console.log('🧹 [FirebaseSync] Starting duplicate cleanup...');
+
+    try {
+      const allPrompts = await storage.loadAllPrompts();
+      const seen = new Map<string, Prompt>();
+      let duplicatesRemoved = 0;
+
+      for (const prompt of allPrompts) {
+        const contentSnippet = prompt.bodyContent.substring(0, 120).trim().toLowerCase();
+        const titleSnippet = prompt.label.substring(0, 60).trim().toLowerCase();
+        const key = `${contentSnippet}||${titleSnippet}`;
+
+        if (seen.has(key)) {
+          // This is a duplicate — remove it
+          await storage.deletePrompt(prompt.id);
+          console.log(`🗑️ [FirebaseSync] Removed duplicate: ${prompt.label}`);
+          duplicatesRemoved++;
+        } else {
+          // First occurrence — keep it
+          seen.set(key, prompt);
+        }
+      }
+
+      console.log(`✅ [FirebaseSync] Cleanup complete: ${duplicatesRemoved} duplicates removed`);
+      return duplicatesRemoved;
+    } catch (err) {
+      console.error('❌ [FirebaseSync] Cleanup failed:', err);
+      return 0;
+    }
   }
 
   /**

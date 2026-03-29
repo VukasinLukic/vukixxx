@@ -54,6 +54,7 @@ pub fn run() {
             commands::filesystem::write_prompt_file,
             commands::filesystem::delete_prompt_file,
             commands::filesystem::ensure_prompts_dir,
+            commands::filesystem::write_claude_md,
             commands::settings::load_settings,
             commands::settings::save_settings,
             commands::watcher::start_watcher,

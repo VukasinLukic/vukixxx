@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Home, Lightbulb, Brain, Layers, Settings } from 'lucide-react';
+import { Home, Lightbulb, Brain, Layers, Settings, User, LayoutDashboard, Moon } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TabId } from '@/types';
@@ -40,6 +40,9 @@ const items: { id: TabId; icon: LucideIcon; label: string }[] = [
   { id: 'prompts', icon: Lightbulb, label: 'Prompts' },
   { id: 'memory', icon: Brain, label: 'Memory Graph' },
   { id: 'packs', icon: Layers, label: 'Memory Packs' },
+  { id: 'profile',  icon: User,            label: 'Moj Profil' },
+  { id: 'digest',   icon: LayoutDashboard, label: 'Digest' },
+  { id: 'nightly',  icon: Moon,            label: 'Nightly' },
   { id: 'settings', icon: Settings, label: 'Settings' },
 ];
 

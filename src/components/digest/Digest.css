@@ -1,0 +1,230 @@
+.digest-container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+}
+
+.digest-content {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.digest-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0 0 32px;
+}
+
+/* Filter bar */
+
+.digest-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.digest-filter-btn {
+  padding: 5px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  background: none;
+  font-size: 12px;
+  font-weight: 500;
+  color: #86868b;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.digest-filter-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.digest-filter-btn.active {
+  color: #007aff;
+  border-color: rgba(0, 122, 255, 0.3);
+  background: rgba(0, 122, 255, 0.06);
+}
+
+/* Project digest cards */
+
+.digest-project-card {
+  margin-bottom: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+}
+
+.digest-project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.digest-project-header:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.digest-project-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.digest-project-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.digest-log-count {
+  font-size: 11px;
+  color: #86868b;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Log entries */
+
+.digest-log-list {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 8px 16px 12px;
+}
+
+.digest-log-entry {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  align-items: flex-start;
+}
+
+.digest-log-entry + .digest-log-entry {
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.digest-outcome-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.digest-outcome-dot.success { background: #30d158; }
+.digest-outcome-dot.partial { background: #ff9f0a; }
+.digest-outcome-dot.blocked { background: #ff453a; }
+.digest-outcome-dot.info { background: #007aff; }
+
+.digest-log-content {
+  flex: 1;
+}
+
+.digest-log-summary {
+  font-size: 13px;
+  color: #1d1d1f;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.digest-log-date {
+  font-size: 11px;
+  color: #86868b;
+  margin-top: 2px;
+}
+
+.digest-log-delete {
+  background: none;
+  border: none;
+  color: #86868b;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.digest-log-entry:hover .digest-log-delete {
+  opacity: 1;
+}
+
+.digest-log-delete:hover {
+  color: #ff453a;
+}
+
+/* Add log form */
+
+.digest-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.01);
+}
+
+.digest-add-row {
+  display: flex;
+  gap: 8px;
+}
+
+.digest-add-form select,
+.digest-add-form input {
+  padding: 6px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  color: #1d1d1f;
+  background: #fff;
+}
+
+.digest-add-form input {
+  flex: 1;
+}
+
+.digest-add-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #007aff;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.digest-add-btn:hover {
+  background: #0066d6;
+}
+
+.digest-add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.digest-empty {
+  text-align: center;
+  padding: 40px 24px;
+  color: #86868b;
+  font-size: 13px;
+}
+
+/* Dispatch section */
+
+.digest-dispatch-section {
+  margin-bottom: 32px;
+  padding: 16px;
+  border: 1px solid #34c759;
+  border-radius: 12px;
+  background: rgba(52, 199, 89, 0.05);
+}

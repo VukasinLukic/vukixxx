@@ -13,11 +13,15 @@ import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { GraphErrorBoundary } from './components/ui/GraphErrorBoundary';
 import { MemoryPacksView } from './components/packs/MemoryPacksView';
 import { SettingsView } from './components/settings/SettingsView';
+import { ProfileView } from './components/profile/ProfileView';
+import { DigestView } from './components/digest/DigestView';
+import { NightlyView } from './components/nightly/NightlyView';
 import { HelpModal } from './components/help/HelpModal';
 import { usePromptStore } from './stores/promptStore';
 import { usePanelStore } from './stores/panelStore';
 import { useUIStore } from './stores/uiStore';
 import { useAIStore } from './stores/aiStore';
+import { useProfileStore } from './stores/profileStore';
 import { initTauri } from './lib/tauriSetup';
 import { initializeFirebase } from './services/firebase/firebaseConfig';
 import { promptSyncService } from './services/firebase/promptSyncService';
@@ -63,6 +67,7 @@ function App() {
   } = useUIStore();
 
   const { loadProvidersFromDisk } = useAIStore();
+  const { loadProfile, loadProjects } = useProfileStore();
 
   // Load prompts and AI providers on mount + initialize Tauri + Firebase
   useEffect(() => {
@@ -71,6 +76,8 @@ function App() {
       await Promise.all([
         loadPrompts(),
         loadProvidersFromDisk(),
+        loadProfile(),
+        loadProjects(),
       ]);
 
       initWatcher();
@@ -78,7 +85,18 @@ function App() {
 
       // Initialize Firebase AFTER providers are loaded
       try {
-        initializeFirebase();
+  initializeFirebase();
+
+        // Clean up any existing duplicates before starting sync
+        try {
+          const cleaned = await promptSyncService.cleanupDuplicates();
+          if (cleaned > 0) {
+            await loadPrompts(); // Reload after cleanup
+          }
+        } catch (err) {
+          console.warn('⚠️ [App] Duplicate cleanup failed:', err);
+        }
+
         promptSyncService.startSync((newPrompt) => {
           console.log('📥 [App] New prompt synced from extension:', newPrompt.label);
           loadPrompts();
@@ -94,7 +112,7 @@ function App() {
     return () => {
       promptSyncService.stopSync();
     };
-  }, [loadPrompts, loadProvidersFromDisk, initWatcher, setActiveTab, success]);
+  }, [loadPrompts, loadProvidersFromDisk, loadProfile, loadProjects, initWatcher, setActiveTab, success]);
 
   // Show browser when prompts tab is active
   useEffect(() => {
@@ -259,6 +277,66 @@ function App() {
               }}
             >
               <MemoryPacksView />
+            </motion.div>
+          )}
+
+          {/* Profile */}
+          {activeTab === 'profile' && (
+            <motion.div
+              key="profile"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.25 }}
+              style={{
+                position: 'absolute', top: 36, left: 0, width: '100%',
+                height: 'calc(100% - 116px)', zIndex: 2,
+                background: 'rgba(245,245,247,0.95)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+              }}
+            >
+              <ProfileView />
+            </motion.div>
+          )}
+
+          {/* Digest */}
+          {activeTab === 'digest' && (
+            <motion.div
+              key="digest"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.25 }}
+              style={{
+                position: 'absolute', top: 36, left: 0, width: '100%',
+                height: 'calc(100% - 116px)', zIndex: 2,
+                background: 'rgba(245,245,247,0.95)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+              }}
+            >
+              <DigestView />
+            </motion.div>
+          )}
+
+          {/* Nightly */}
+          {activeTab === 'nightly' && (
+            <motion.div
+              key="nightly"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.25 }}
+              style={{
+                position: 'absolute', top: 36, left: 0, width: '100%',
+                height: 'calc(100% - 116px)', zIndex: 2,
+                background: 'rgba(245,245,247,0.95)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+              }}
+            >
+              <NightlyView />
             </motion.div>
           )}
 

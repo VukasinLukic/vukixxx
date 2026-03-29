@@ -112,3 +112,37 @@ pub async fn delete_prompt_file(app: AppHandle, filename: String) -> Result<(), 
 
     Ok(())
 }
+
+/// Write CLAUDE.md file to a specific project folder
+#[tauri::command]
+pub async fn write_claude_md(
+    _app: AppHandle,
+    project_path: String,
+    content: String,
+) -> Result<String, String> {
+    // Convert string path to PathBuf
+    let path = PathBuf::from(&project_path);
+
+    // Security: reject empty or absolute-looking paths
+    if project_path.is_empty() || project_path.contains("..") {
+        return Err("Invalid project path".to_string());
+    }
+
+    // Create parent directory if it doesn't exist
+    if let Some(parent) = path.parent() {
+        if !parent.as_os_str().is_empty() {
+            fs::create_dir_all(parent).map_err(|e| format!("Failed to create directory: {}", e))?;
+        }
+    }
+
+    // Write the file
+    let claude_md_path = path.join("CLAUDE.md");
+    fs::write(&claude_md_path, &content)
+        .map_err(|e| format!("Failed to write CLAUDE.md: {}", e))?;
+
+    // Return the full path written to
+    claude_md_path
+        .to_str()
+        .map(|s| s.to_string())
+        .ok_or_else(|| "Invalid path encoding".to_string())
+}

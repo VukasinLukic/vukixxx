@@ -32,7 +32,9 @@
       "Bash(cargo tauri build:*)",
       "Bash(npx tsc:*)",
       "Bash(npx vite build:*)",
-      "Bash(git -C c:/Vukixxx check-ignore:*)"
+      "Bash(git -C c:/Vukixxx check-ignore:*)",
+      "WebSearch",
+      "Bash(npm run:*)"
     ]
   }
 }
