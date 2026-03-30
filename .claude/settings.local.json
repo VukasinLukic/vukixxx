@@ -38,7 +38,10 @@
       "Bash(grep -E \"\\\\.\\(js|json|env|md\\)$\")",
       "Bash(find /c/Vukixxx -name *.env* -type f)",
       "Bash(xargs grep:*)",
-      "Bash(powershell -Command \":*)"
+      "Bash(powershell -Command \":*)",
+      "Bash(ssh-keygen:*)",
+      "Bash(/tmp/rustup-init.exe:*)",
+      "Bash(export PATH=\"$HOME/.cargo/bin:$PATH\")"
     ]
   }
 }
