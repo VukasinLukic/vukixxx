@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie';
-import type { Prompt, MemoryPack, SystemRole, AppSettings, UserProfile, Project, ClaudeLogEntry, NightlyTask } from '@/types';
+import type { Prompt, MemoryPack, SystemRole, AppSettings, UserProfile, Project, ClaudeLogEntry, NightlyTask, Task } from '@/types';
 import type { StorageAdapter } from './StorageAdapter';
 
 class VukixxxDB extends Dexie {
@@ -11,6 +11,7 @@ class VukixxxDB extends Dexie {
   projects!: Table<Project, string>;
   logEntries!: Table<ClaudeLogEntry, string>;
   nightlyTasks!: Table<NightlyTask, string>;
+  tasks!: Table<Task, string>;
 
   constructor() {
     super('VukixxxDB');
@@ -29,6 +30,17 @@ class VukixxxDB extends Dexie {
       projects: 'id, status, priority, createdAt',
       logEntries: 'id, projectId, createdAt',
       nightlyTasks: 'id, projectId, status, createdAt',
+    });
+    this.version(3).stores({
+      prompts: 'id, category, createdAt, updatedAt',
+      packs: 'id, createdAt',
+      roles: 'id',
+      settings: 'key',
+      profiles: 'key',
+      projects: 'id, status, priority, createdAt',
+      logEntries: 'id, projectId, createdAt',
+      nightlyTasks: 'id, projectId, status, createdAt',
+      tasks: 'id, projectId, status, createdAt, createdBy',
     });
   }
 }
@@ -144,5 +156,19 @@ export class IndexedDBAdapter implements StorageAdapter {
 
   async deleteNightlyTask(id: string): Promise<void> {
     await db.nightlyTasks.delete(id);
+  }
+
+  // --- Task Queue ---
+
+  async loadAllTasks(): Promise<Task[]> {
+    return db.tasks.toArray();
+  }
+
+  async saveTask(task: Task): Promise<void> {
+    await db.tasks.put(task);
+  }
+
+  async deleteTask(id: string): Promise<void> {
+    await db.tasks.delete(id);
   }
 }

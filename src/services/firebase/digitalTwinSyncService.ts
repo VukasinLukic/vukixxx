@@ -1,6 +1,6 @@
 import { doc, setDoc, collection } from 'firebase/firestore';
 import { getFirestoreDb } from './firebaseConfig';
-import type { UserProfile, Project, ClaudeLogEntry, NightlyTask } from '@/types';
+import type { UserProfile, Project, ClaudeLogEntry, NightlyTask, Task } from '@/types';
 
 function db() {
   try {
@@ -48,6 +48,16 @@ export const digitalTwinSyncService = {
       await setDoc(doc(collection(firestore, 'nightlyResults'), task.id), task);
     } catch (err) {
       console.warn('[DigitalTwinSync] Failed to sync nightly result:', err);
+    }
+  },
+
+  async saveTask(task: Task): Promise<void> {
+    const firestore = db();
+    if (!firestore) return;
+    try {
+      await setDoc(doc(collection(firestore, 'tasks'), task.id), task);
+    } catch (err) {
+      console.warn('[DigitalTwinSync] Failed to sync task:', err);
     }
   },
 };

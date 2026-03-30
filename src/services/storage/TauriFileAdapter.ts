@@ -1,7 +1,7 @@
 import { invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { parsePromptFile, serializePrompt } from '@/lib/promptParser';
-import type { Prompt, MemoryPack, SystemRole, AppSettings, UserProfile, Project, ClaudeLogEntry, NightlyTask } from '@/types';
+import type { Prompt, MemoryPack, SystemRole, AppSettings, UserProfile, Project, ClaudeLogEntry, NightlyTask, Task } from '@/types';
 import type { StorageAdapter } from './StorageAdapter';
 
 interface PromptFile {
@@ -244,6 +244,37 @@ export class TauriFileAdapter implements StorageAdapter {
     const filtered = tasks.filter(t => t.id !== id);
     await invoke('write_prompt_file', {
       filename: '_nightly.json',
+      content: JSON.stringify(filtered, null, 2),
+    });
+  }
+
+  // --- Task Queue ---
+
+  async loadAllTasks(): Promise<Task[]> {
+    try {
+      const content = await invoke<string>('read_prompt_file', { filename: '_tasks.json' });
+      return JSON.parse(content);
+    } catch {
+      return [];
+    }
+  }
+
+  async saveTask(task: Task): Promise<void> {
+    const tasks = await this.loadAllTasks();
+    const idx = tasks.findIndex(t => t.id === task.id);
+    if (idx >= 0) tasks[idx] = task;
+    else tasks.push(task);
+    await invoke('write_prompt_file', {
+      filename: '_tasks.json',
+      content: JSON.stringify(tasks, null, 2),
+    });
+  }
+
+  async deleteTask(id: string): Promise<void> {
+    const tasks = await this.loadAllTasks();
+    const filtered = tasks.filter(t => t.id !== id);
+    await invoke('write_prompt_file', {
+      filename: '_tasks.json',
       content: JSON.stringify(filtered, null, 2),
     });
   }

@@ -34,7 +34,11 @@
       "Bash(npx vite build:*)",
       "Bash(git -C c:/Vukixxx check-ignore:*)",
       "WebSearch",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(grep -E \"\\\\.\\(js|json|env|md\\)$\")",
+      "Bash(find /c/Vukixxx -name *.env* -type f)",
+      "Bash(xargs grep:*)",
+      "Bash(powershell -Command \":*)"
     ]
   }
 }

@@ -42,7 +42,7 @@ const items: { id: TabId; icon: LucideIcon; label: string }[] = [
   { id: 'packs', icon: Layers, label: 'Memory Packs' },
   { id: 'profile',  icon: User,            label: 'Moj Profil' },
   { id: 'digest',   icon: LayoutDashboard, label: 'Digest' },
-  { id: 'nightly',  icon: Moon,            label: 'Nightly' },
+  { id: 'nightly',  icon: Moon,            label: 'Task Queue' },
   { id: 'settings', icon: Settings, label: 'Settings' },
 ];
 

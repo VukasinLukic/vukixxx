@@ -1,3 +1,6 @@
+// DEPRECATED — nije pozivan nakon Task Queue refaktora
+// Claude API pozivi za taskove sada idu kroz MCP server (vukixx-mcp/).
+// Bezbedno za brisanje kada se verifikuje da nema importa u projektu.
 import { ClaudeProvider } from '@/services/ai/ClaudeProvider';
 import type { NightlyTask, LLMProviderConfig } from '@/types';
 

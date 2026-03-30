@@ -1,46 +1,43 @@
 import { create } from 'zustand';
-import type { NightlyTask, ProjectPriority } from '@/types';
+import type { Task, ProjectPriority } from '@/types';
 import { createStorageAdapter } from '@/services/storage/createAdapter';
-import { runNightlyTask } from '@/services/nightlyTaskService';
-import { buildVukiContext } from '@/services/contextBuilder';
 import { digitalTwinSyncService } from '@/services/firebase/digitalTwinSyncService';
-import { useProfileStore } from './profileStore';
-import { usePromptStore } from './promptStore';
-import { useAIStore } from './aiStore';
+import { collection, onSnapshot, query, orderBy, type Unsubscribe } from 'firebase/firestore';
+import { getFirestoreDb } from '@/services/firebase/firebaseConfig';
 
 const storage = createStorageAdapter();
 
 function generateId(): string {
-  return `ntask-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return `task-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-interface NightlyState {
-  tasks: Map<string, NightlyTask>;
-  isProcessing: boolean;
+interface TaskQueueState {
+  tasks: Map<string, Task>;
   isLoading: boolean;
+  firestoreUnsubscribe: Unsubscribe | null;
 
   loadTasks: () => Promise<void>;
-  addTask: (input: Pick<NightlyTask, 'projectId' | 'task' | 'priority'>) => Promise<NightlyTask>;
+  addTask: (input: Pick<Task, 'projectId' | 'task' | 'priority'>) => Promise<Task>;
   deleteTask: (id: string) => Promise<void>;
-  runTask: (taskId: string) => Promise<void>;
-  runAllPending: () => Promise<void>;
+  subscribeToFirestoreTasks: () => void;
+  unsubscribeFromFirestoreTasks: () => void;
 
-  getTasksArray: () => NightlyTask[];
-  getPendingTasks: () => NightlyTask[];
+  getTasksArray: () => Task[];
+  getPendingTasks: () => Task[];
 }
 
 const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
-export const useNightlyStore = create<NightlyState>((set, get) => ({
+export const useNightlyStore = create<TaskQueueState>((set, get) => ({
   tasks: new Map(),
-  isProcessing: false,
   isLoading: false,
+  firestoreUnsubscribe: null,
 
   loadTasks: async () => {
     set({ isLoading: true });
     try {
-      const tasks = await storage.loadAllNightlyTasks();
-      const map = new Map<string, NightlyTask>();
+      const tasks = await storage.loadAllTasks();
+      const map = new Map<string, Task>();
       for (const t of tasks) map.set(t.id, t);
       set({ tasks: map, isLoading: false });
     } catch {
@@ -50,15 +47,17 @@ export const useNightlyStore = create<NightlyState>((set, get) => ({
 
   addTask: async (input) => {
     const now = new Date().toISOString();
-    const task: NightlyTask = {
+    const task: Task = {
       id: generateId(),
       ...input,
       status: 'pending',
       result: null,
       createdAt: now,
       completedAt: null,
+      createdBy: 'user',
     };
-    await storage.saveNightlyTask(task);
+    await storage.saveTask(task);
+    digitalTwinSyncService.saveTask(task);
     set(state => {
       const newMap = new Map(state.tasks);
       newMap.set(task.id, task);
@@ -68,7 +67,7 @@ export const useNightlyStore = create<NightlyState>((set, get) => ({
   },
 
   deleteTask: async (id) => {
-    await storage.deleteNightlyTask(id);
+    await storage.deleteTask(id);
     set(state => {
       const newMap = new Map(state.tasks);
       newMap.delete(id);
@@ -76,85 +75,47 @@ export const useNightlyStore = create<NightlyState>((set, get) => ({
     });
   },
 
-  runTask: async (taskId) => {
-    const task = get().tasks.get(taskId);
-    if (!task) return;
-
-    // Get Claude config
-    const providers = useAIStore.getState().providers;
-    const claudeConfig = providers.claude;
-    if (!claudeConfig?.apiKey) {
-      throw new Error('Claude API ključ nije konfigurisan');
-    }
-
-    // Update status to processing
-    const processing: NightlyTask = { ...task, status: 'processing' };
-    set(state => {
-      const newMap = new Map(state.tasks);
-      newMap.set(taskId, processing);
-      return { tasks: newMap };
-    });
-    await storage.saveNightlyTask(processing);
-
+  subscribeToFirestoreTasks: () => {
+    if (get().firestoreUnsubscribe) return;
     try {
-      // Build context from live store snapshots
-      const { profile, getActiveProjects } = useProfileStore.getState();
-      const topPrompts = usePromptStore.getState().getPromptsArray()
-        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-        .slice(0, 10);
-
-      const context = buildVukiContext({
-        profile,
-        activeProjects: getActiveProjects(),
-        topPrompts,
+      const db = getFirestoreDb();
+      const q = query(collection(db, 'tasks'), orderBy('createdAt', 'desc'));
+      const unsub = onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach(async (change) => {
+          if (change.type === 'added' || change.type === 'modified') {
+            const data = change.doc.data() as Task;
+            await storage.saveTask(data);
+            set(state => {
+              const newMap = new Map(state.tasks);
+              newMap.set(data.id, data);
+              return { tasks: newMap };
+            });
+          }
+          if (change.type === 'removed') {
+            const id = change.doc.id;
+            await storage.deleteTask(id);
+            set(state => {
+              const newMap = new Map(state.tasks);
+              newMap.delete(id);
+              return { tasks: newMap };
+            });
+          }
+        });
+      }, (err) => {
+        console.warn('[TaskQueue] Firestore listener error:', err);
       });
-
-      const { result, tokensUsed } = await runNightlyTask(task, context, claudeConfig);
-
-      const done: NightlyTask = {
-        ...task,
-        status: 'done',
-        result,
-        tokensUsed,
-        completedAt: new Date().toISOString(),
-      };
-      await storage.saveNightlyTask(done);
-      digitalTwinSyncService.saveNightlyResult(done);
-      set(state => {
-        const newMap = new Map(state.tasks);
-        newMap.set(taskId, done);
-        return { tasks: newMap };
-      });
+      set({ firestoreUnsubscribe: unsub });
     } catch (err) {
-      const errTask: NightlyTask = {
-        ...task,
-        status: 'error',
-        result: err instanceof Error ? err.message : 'Unknown error',
-        completedAt: new Date().toISOString(),
-      };
-      await storage.saveNightlyTask(errTask);
-      set(state => {
-        const newMap = new Map(state.tasks);
-        newMap.set(taskId, errTask);
-        return { tasks: newMap };
-      });
+      console.warn('[TaskQueue] Firestore subscription failed:', err);
     }
   },
 
-  runAllPending: async () => {
-    if (get().isProcessing) return;
-    set({ isProcessing: true });
-
-    const pending = get().getPendingTasks();
-    for (const task of pending) {
-      try {
-        await get().runTask(task.id);
-      } catch {
-        // continue with next task
-      }
+  unsubscribeFromFirestoreTasks: () => {
+    const unsub = get().firestoreUnsubscribe;
+    if (unsub) {
+      unsub();
+      set({ firestoreUnsubscribe: null });
     }
-
-    set({ isProcessing: false });
   },
 
   getTasksArray: () =>

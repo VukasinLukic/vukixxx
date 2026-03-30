@@ -1,4 +1,4 @@
-import type { Prompt, MemoryPack, SystemRole, AppSettings, UserProfile, Project, ClaudeLogEntry, NightlyTask } from '@/types';
+import type { Prompt, MemoryPack, SystemRole, AppSettings, UserProfile, Project, ClaudeLogEntry, NightlyTask, Task } from '@/types';
 
 export interface StorageAdapter {
   // Prompts
@@ -38,4 +38,9 @@ export interface StorageAdapter {
   loadAllNightlyTasks(): Promise<NightlyTask[]>;
   saveNightlyTask(task: NightlyTask): Promise<void>;
   deleteNightlyTask(id: string): Promise<void>;
+
+  // Task Queue (synced with Firestore `tasks` collection)
+  loadAllTasks(): Promise<Task[]>;
+  saveTask(task: Task): Promise<void>;
+  deleteTask(id: string): Promise<void>;
 }

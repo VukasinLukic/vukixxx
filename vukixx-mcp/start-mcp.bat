@@ -1,0 +1,4 @@
+@echo off
+echo Starting VukiXX MCP Server...
+cd /d c:\Vukixxx\vukixx-mcp
+node dist\index.js

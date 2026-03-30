@@ -264,6 +264,23 @@ export interface NightlyTask {
   completedAt: string | null;
 }
 
+// --- Task Queue (MCP-driven, synced with Firestore `tasks` collection) ---
+
+export type TaskStatus = 'pending' | 'in_progress' | 'done' | 'error';
+export type TaskCreatedBy = 'user' | 'claude';
+
+export interface Task {
+  id: string;
+  projectId: string;
+  task: string;
+  priority: ProjectPriority;
+  status: TaskStatus;
+  result: string | null;
+  createdAt: string;
+  completedAt: string | null;
+  createdBy: TaskCreatedBy;
+}
+
 // --- App Settings ---
 
 export interface AppSettings {

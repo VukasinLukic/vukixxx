@@ -1,0 +1,22 @@
+{
+  "name": "vukixx-mcp",
+  "version": "1.0.0",
+  "description": "VukiXX MCP server — Firebase-backed tools for Claude dispatch workflow",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "firebase-admin": "^12.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.3"
+  }
+}

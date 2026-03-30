@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { AlertTriangle, Play, Plus } from 'lucide-react';
+import { Copy, Plus } from 'lucide-react';
 import { useNightlyStore } from '@/stores/nightlyStore';
 import { useProfileStore } from '@/stores/profileStore';
-import { useAIStore } from '@/stores/aiStore';
 import { useUIStore } from '@/stores/uiStore';
 import { NightlyTaskCard } from './NightlyTaskCard';
-import type { ProjectPriority } from '@/types';
+import type { ProjectPriority, Task } from '@/types';
 import './Nightly.css';
 
 export const NightlyView: React.FC = () => {
@@ -13,16 +12,14 @@ export const NightlyView: React.FC = () => {
     loadTasks,
     addTask,
     deleteTask,
-    runTask,
-    runAllPending,
-    isProcessing,
+    subscribeToFirestoreTasks,
+    unsubscribeFromFirestoreTasks,
     getTasksArray,
     getPendingTasks,
   } = useNightlyStore();
 
   const { getProjectsArray } = useProfileStore();
-  const { providers } = useAIStore();
-  const { success, error, setActiveTab } = useUIStore();
+  const { success } = useUIStore();
 
   const [showForm, setShowForm] = useState(false);
   const [taskText, setTaskText] = useState('');
@@ -31,12 +28,13 @@ export const NightlyView: React.FC = () => {
 
   useEffect(() => {
     loadTasks();
-  }, [loadTasks]);
+    subscribeToFirestoreTasks();
+    return () => unsubscribeFromFirestoreTasks();
+  }, [loadTasks, subscribeToFirestoreTasks, unsubscribeFromFirestoreTasks]);
 
   const projects = getProjectsArray();
   const tasks = getTasksArray();
-  const pendingCount = getPendingTasks().length;
-  const hasClaude = !!providers.claude?.apiKey;
+  const projectNameMap = new Map(projects.map(p => [p.id, p.name]));
 
   // Set default projectId when projects load
   useEffect(() => {
@@ -53,45 +51,48 @@ export const NightlyView: React.FC = () => {
     setShowForm(false);
   }, [taskText, projectId, priority, addTask, success]);
 
-  const handleRunAll = useCallback(async () => {
-    try {
-      await runAllPending();
-      success('Svi zadaci završeni');
-    } catch (err) {
-      error(err instanceof Error ? err.message : 'Greška pri pokretanju');
-    }
-  }, [runAllPending, success, error]);
+  const handleCopyForDispatch = useCallback((task: Task) => {
+    const projectName = projectNameMap.get(task.projectId) ?? 'Unknown project';
+    const msg = `[Task] ${task.task}
+Project: ${projectName}
+Priority: ${task.priority}
+Context: Use get_my_context tool first, then work on this task.
+When done: call complete_task(${task.id}, result) and add_claude_log.`;
+    navigator.clipboard.writeText(msg);
+    success('Kopirano za Dispatch');
+  }, [projectNameMap, success]);
 
-  const handleRunSingle = useCallback(async (taskId: string) => {
-    try {
-      await runTask(taskId);
-      success('Zadatak završen');
-    } catch (err) {
-      error(err instanceof Error ? err.message : 'Greška pri pokretanju');
-    }
-  }, [runTask, success, error]);
-
-  // Find project name by ID
-  const projectNameMap = new Map(projects.map(p => [p.id, p.name]));
+  // Per-project open task counts
+  const openCountByProject = projects
+    .map(p => ({ name: p.name, count: tasks.filter(t => t.projectId === p.id && t.status === 'pending').length }))
+    .filter(x => x.count > 0);
 
   return (
     <div className="nightly-container">
       <div className="nightly-content">
-        <h2 className="nightly-title">Nightly Tasks</h2>
+        <h2 className="nightly-title">Task Queue</h2>
         <p className="nightly-subtitle">
-          Zadaci koje Claude obrađuje za tebe. Dodaj zadatak, klikni "Pokreni sve".
+          Taskovi za Claude Dispatch. Kopiraj task i pokreni kroz MCP interfejs.
         </p>
 
-        {/* Warning if no Claude API key */}
-        {!hasClaude && (
-          <div className="nightly-warning">
-            <AlertTriangle size={18} color="#ff9f0a" />
-            <span className="nightly-warning-text">
-              Claude API ključ nije konfigurisan.{' '}
-              <span className="nightly-warning-link" onClick={() => setActiveTab('settings')}>
-                Podesi u Settings
+        {/* Per-project open task badges */}
+        {openCountByProject.length > 0 && (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+            {openCountByProject.map(({ name, count }) => (
+              <span
+                key={name}
+                style={{
+                  fontSize: 12,
+                  padding: '3px 10px',
+                  borderRadius: 12,
+                  background: 'rgba(0,113,227,0.1)',
+                  color: '#0071e3',
+                  fontWeight: 500,
+                }}
+              >
+                {name}: {count} open
               </span>
-            </span>
+            ))}
           </div>
         )}
 
@@ -139,32 +140,11 @@ export const NightlyView: React.FC = () => {
           </button>
         )}
 
-        {/* Run all button */}
-        {pendingCount > 0 && (
-          <button
-            className="nightly-run-all"
-            onClick={handleRunAll}
-            disabled={isProcessing || !hasClaude}
-          >
-            {isProcessing ? (
-              <>
-                <span className="nightly-spinner" />
-                Obrađujem...
-              </>
-            ) : (
-              <>
-                <Play size={16} />
-                Pokreni sve ({pendingCount} {pendingCount === 1 ? 'zadatak' : 'zadataka'})
-              </>
-            )}
-          </button>
-        )}
-
         {/* Task list */}
         <div className="nightly-task-list">
           {tasks.length === 0 ? (
             <p className="nightly-empty">
-              Nema zadataka. Klikni "Dodaj zadatak" da kreiraš prvi.
+              Nema zadataka. Dodaj ih ovde ili neka Claude kreira via MCP.
             </p>
           ) : (
             tasks.map(task => (
@@ -172,7 +152,7 @@ export const NightlyView: React.FC = () => {
                 key={task.id}
                 task={task}
                 projectName={projectNameMap.get(task.projectId) ?? 'Nepoznat projekat'}
-                onRun={() => handleRunSingle(task.id)}
+                onCopyDispatch={() => handleCopyForDispatch(task)}
                 onDelete={() => deleteTask(task.id)}
               />
             ))

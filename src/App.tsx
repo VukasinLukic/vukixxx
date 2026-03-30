@@ -218,18 +218,76 @@ function App() {
 
   // Welcome panel content
   const WelcomeContent = (
-    <div style={{ padding: 4, fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif' }}>
-      <h3 style={{ marginBottom: 12, fontSize: 17, fontWeight: 600, color: '#1d1d1f' }}>Vukixxx AI Workbench</h3>
-      <p style={{ fontSize: 13, color: '#86868b', lineHeight: 1.6 }}>
-        Welcome to your AI Context Workbench. Use the Dock below to navigate.
+    <div style={{ padding: 4, fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif', overflowY: 'auto', maxHeight: '100%' }}>
+      <h3 style={{ marginBottom: 4, fontSize: 17, fontWeight: 700, color: '#1d1d1f' }}>Vukixxx AI Workbench</h3>
+      <p style={{ fontSize: 12, color: '#86868b', lineHeight: 1.5, marginBottom: 14 }}>
+        Your AI brain. Powered by Dispatch + MCP.
       </p>
-      <div style={{ marginTop: 16, padding: 14, background: 'rgba(0,0,0,0.03)', borderRadius: 10 }}>
-        <div style={{ fontSize: 11, color: '#1d1d1f', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Quick Tips</div>
-        <ul style={{ fontSize: 13, color: '#86868b', marginTop: 10, paddingLeft: 18, lineHeight: 1.8 }}>
-          <li><span style={{ color: '#1d1d1f' }}>Memory Graph</span> - Visualize your prompt hierarchy in 3D</li>
-          <li><span style={{ color: '#1d1d1f' }}>Prompts</span> - Browse and manage your knowledge base</li>
-          <li><span style={{ color: '#1d1d1f' }}>Copy TOON</span> - Export prompts in compressed format</li>
+
+      {/* Quick Tips */}
+      <div style={{ marginBottom: 12, padding: 12, background: 'rgba(0,113,227,0.06)', borderRadius: 10, border: '1px solid rgba(0,113,227,0.12)' }}>
+        <div style={{ fontSize: 11, color: '#0071e3', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 8 }}>Quick Tips</div>
+        <ul style={{ fontSize: 12, color: '#444', margin: 0, paddingLeft: 16, lineHeight: 1.9 }}>
+          <li><span style={{ color: '#1d1d1f', fontWeight: 600 }}>Task Queue</span> — dodaj zadatke, kopiraj za Dispatch</li>
+          <li><span style={{ color: '#1d1d1f', fontWeight: 600 }}>Digest</span> — pregled projekata + CLAUDE.md generator</li>
+          <li><span style={{ color: '#1d1d1f', fontWeight: 600 }}>Moj Profil</span> — postavi folderPath za Git sync</li>
+          <li><span style={{ color: '#1d1d1f', fontWeight: 600 }}>MCP server</span> — pokreni vukixx-mcp za Claude Dispatch</li>
+          <li><span style={{ color: '#1d1d1f', fontWeight: 600 }}>Memory Graph</span> — 3D vizualizacija prompt hijerarhije</li>
         </ul>
+      </div>
+
+      {/* Checklist pre rada */}
+      <div style={{ marginBottom: 12, padding: 12, background: 'rgba(52,199,89,0.06)', borderRadius: 10, border: '1px solid rgba(52,199,89,0.18)' }}>
+        <div style={{ fontSize: 11, color: '#34c759', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 8 }}>Checklist pre rada</div>
+        {[
+          'Firebase Firestore je aktivan',
+          'MCP server pokrenut (vukixx-mcp)',
+          'Claude Desktop konfigurisan sa MCP',
+          'Profile popunjen (ime, stack, stil)',
+          'Projekat ima folderPath polje',
+          'Chrome extension šalje promptove',
+          'Task Queue je prazan ili ažuriran',
+        ].map((item, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#444', lineHeight: 2 }}>
+            <span style={{ color: '#34c759', fontSize: 13, fontWeight: 700 }}>✓</span>
+            <span>{item}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Kako koristiti */}
+      <div style={{ marginBottom: 12, padding: 12, background: 'rgba(0,0,0,0.03)', borderRadius: 10 }}>
+        <div style={{ fontSize: 11, color: '#1d1d1f', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 8 }}>Kako koristiti sistem</div>
+        {[
+          { n: '1', label: 'Dodaj task', desc: 'U Task Queue kreiraj zadatak i kopiraj za Dispatch' },
+          { n: '2', label: 'Pokreni Claude', desc: 'Zalepi u Claude Desktop — MCP automatski čita kontekst' },
+          { n: '3', label: 'Claude piše nazad', desc: 'add_claude_log + complete_task ažuriraju Firebase i Git' },
+        ].map(({ n, label, desc }) => (
+          <div key={n} style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
+            <span style={{ minWidth: 20, height: 20, borderRadius: '50%', background: '#1d1d1f', color: '#fff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{n}</span>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#1d1d1f' }}>{label}</div>
+              <div style={{ fontSize: 11, color: '#86868b', lineHeight: 1.5 }}>{desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Upozorenja */}
+      <div style={{ padding: 12, background: 'rgba(255,149,0,0.06)', borderRadius: 10, border: '1px solid rgba(255,149,0,0.2)' }}>
+        <div style={{ fontSize: 11, color: '#ff9500', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 8 }}>Na sta pazi</div>
+        {[
+          'Render server može zaspati (free tier) — podesi UptimeRobot ping na /healthz, interval 5 min → uptimerobot.com',
+          'Git sync radi samo ako je folderPath validan git repo',
+          'MCP server mora biti pokrenut pre Claude Dispatcha',
+          'Firebase rules moraju dozvoliti write za claudeLogs i tasks',
+          'completeTask ažurira nextStep samo za HIGH priority taskove',
+        ].map((warn, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 11, color: '#555', lineHeight: 1.7 }}>
+            <span style={{ color: '#ff9500', marginTop: 2 }}>!</span>
+            <span>{warn}</span>
+          </div>
+        ))}
       </div>
     </div>
   );

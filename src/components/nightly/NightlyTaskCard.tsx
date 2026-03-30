@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, Play, Trash2 } from 'lucide-react';
-import type { NightlyTask } from '@/types';
+import { ChevronDown, ChevronRight, Copy, Trash2 } from 'lucide-react';
+import type { Task } from '@/types';
 
 interface NightlyTaskCardProps {
-  task: NightlyTask;
+  task: Task;
   projectName: string;
-  onRun: () => void;
+  onCopyDispatch: () => void;
   onDelete: () => void;
 }
 
-export const NightlyTaskCard: React.FC<NightlyTaskCardProps> = ({ task, projectName, onRun, onDelete }) => {
+export const NightlyTaskCard: React.FC<NightlyTaskCardProps> = ({ task, projectName, onCopyDispatch, onDelete }) => {
   const [expanded, setExpanded] = useState(false);
 
   const hasResult = task.status === 'done' || task.status === 'error';
+  const createdByBadge = task.createdBy === 'claude' ? '🤖' : '👤';
 
   return (
     <div className="nightly-task-card">
@@ -23,7 +24,7 @@ export const NightlyTaskCard: React.FC<NightlyTaskCardProps> = ({ task, projectN
             <p className="nightly-task-text">{task.task}</p>
           </div>
           <span className="nightly-task-meta">
-            {projectName} &middot; {new Date(task.createdAt).toLocaleDateString('sr-Latn', { day: 'numeric', month: 'short' })}
+            {createdByBadge} {projectName} &middot; {new Date(task.createdAt).toLocaleDateString('sr-Latn', { day: 'numeric', month: 'short' })}
           </span>
         </div>
         <div className="nightly-task-badges">
@@ -32,8 +33,8 @@ export const NightlyTaskCard: React.FC<NightlyTaskCardProps> = ({ task, projectN
         </div>
         <div className="nightly-task-actions" style={{ marginLeft: 8 }}>
           {task.status === 'pending' && (
-            <button className="nightly-task-btn" onClick={onRun} title="Pokreni">
-              <Play size={12} />
+            <button className="nightly-task-btn" onClick={onCopyDispatch} title="Copy for Dispatch">
+              <Copy size={12} />
             </button>
           )}
           <button className="nightly-task-btn danger" onClick={onDelete} title="Obriši">
@@ -45,11 +46,9 @@ export const NightlyTaskCard: React.FC<NightlyTaskCardProps> = ({ task, projectN
       {expanded && task.result && (
         <div className="nightly-task-result">
           <p className="nightly-task-result-text">{task.result}</p>
-          {task.tokensUsed && (
-            <div className="nightly-task-result-meta">
-              {task.tokensUsed} tokena &middot; Završeno: {task.completedAt ? new Date(task.completedAt).toLocaleString('sr-Latn') : '—'}
-            </div>
-          )}
+          <div className="nightly-task-result-meta">
+            Završeno: {task.completedAt ? new Date(task.completedAt).toLocaleString('sr-Latn') : '—'}
+          </div>
         </div>
       )}
     </div>
