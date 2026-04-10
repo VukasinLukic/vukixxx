@@ -1,0 +1,29 @@
+Šta si opisao
+U suštini — AI memory layer za debugging. Kada Claude Code ili Cursor naiđe na grešku, umesto da svaki put iznova misli, pita tvoj MCP server "hej, jesi li ovo već video?" i dobija gotovo rešenje iz biblioteke.
+
+Zašto je ovo dobro
+Problem koji rešava je realan — svaki developer ponavlja iste greške. TypeScript type errors, Firebase permission denied, CORS, Prisma migration fails... svi smo ih rešavali 10 puta.
+MCP je savršen fit — već imaš Vukixx MCP, znači razumeš protokol. Ovo je prirodno proširenje.
+Biblioteka raste sama — svaki korisnik koji reši grešku doprinosi zajedničkoj bazi. Network effect.
+
+Kako bi izgledalo tehnički
+Developer dobija grešku
+    ↓
+AI agent (Claude Code) zove MCP server
+    ↓
+MCP pretražuje biblioteku — našao? → vraća rešenje
+                          — nije? → AI rešava normalno
+    ↓
+Korisnik potvrdi da je rešeno
+    ↓
+MCP automatski pamti: greška + kontekst + rešenje
+    ↓
+Biblioteka raste
+
+Tri načina da se monetizuje
+1. Open source + cloud sync — lokalna baza besplatna, sync između uređaja i timova plaća se kao subscription (~$9/mesec)
+2. Team plan — firma plaća da ceo tim deli istu biblioteku grešaka. Ovo je B2B i može da ide na $30-50/mesec po timu.
+3. Public marketplace — ako napraviš javnu biblioteku poznatih grešaka po tehnologijama (React errors, Firebase errors...), možeš da naplatiš pristup premium kolekcijama.
+
+Jedina stvar koja me brine
+Kontekst greške je važan — ista poruka greške može imati 5 različitih uzroka. Moraš da pamtiš ne samo poruku nego i stack trace, fajl, tehnologiju, verziju. Inače biblioteka daje pogrešna rešenja.
